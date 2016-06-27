@@ -102,6 +102,9 @@ Blockly.Blocks['listen_bool'] = {
 
 Blockly.JavaScript['listen_bool'] = function(block) {
   var dropdown_speech = block.getFieldValue('SPEECH');
-  var code = 'listenForBool(\'' + dropdown_speech + '\')';
+  var code = 'listenForBool(\'' + dropdown_speech + '\') && (function() { while(resultWord==null) { if(\'' + dropdown_speech + '\' == resultWord) return true; else if (resultWord!=null) return false; } recognition.onresult = function(event) {window.console.log("Checking result."); var speechResult = event.results[0][0].transcript; window.console.log("You said: " + speechResult); resultWord = speechResult; return true;}}())';
   return [code, Blockly.JavaScript.ORDER_NONE];
 };
+
+
+//

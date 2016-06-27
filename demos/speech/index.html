@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Blockly Demo: Tilt Blockly</title>
+  <title>Blockly Demo: Speech Blockly</title>
   <script src="../../blockly_uncompressed.js"></script>
   <script src="../../generators/javascript.js"></script>
   <script src="../../generators/javascript/logic.js"></script>
@@ -46,16 +46,16 @@
   <tr>
    <td>
     <h1><a href="https://developers.google.com/blockly/">Blockly</a> &gt;
-      <a href="../index.html">Demos</a> &gt; Tilt Blockly</h1>
+      <a href="../index.html">Demos</a> &gt; Speech Blockly</h1>
 
       <p>Playing around to see if this works.</p>
 
       <p>&rarr; More info on <a href="https://developers.google.com/blockly/guides/configure-blockly/web/fixed-size">injecting fixed-sized Blockly</a>&hellip;</p>
 
       <p>
-        <button onclick="showCode()">Show JavaScript</button>
+        <button onclick="showCode()">Show JavaScript</button>   
         <button onclick="runCode()">Run JavaScript</button>
-        <button onclick="listen()">Start Talking</button>
+        <button onclick="listenStart()">Start Talking</button>
         <!--button onclick="stopListen()">Stop Talking</button-->
       </p>
 
@@ -91,25 +91,21 @@
     workspace.addChangeListener(updateCode);
     
 
-
-    //Blockly.JavaScript.addReservedWords('code');  //why giving me an error?
-    /*Blockly.Xml.domToWorkspace(document.getElementById('blocklyDiv'),
-                               workspace);*/
-
-    function updateCode() {
+    //updates the code in the workspace so it's ready to execute when called by listen or run code (most current dropdown speech choice). This is called on every change to the blockly workspace. Might be a better way to do this?
+    function updateCode() { 
       var code = Blockly.JavaScript.workspaceToCode(workspace);
       window.console.log("Updating code.");
     }
 
-    function showCode() {   //deprecated
-      // Generate JavaScript code and display it.
+    //associated with the "Show Javascript button", outputs the code in an alert window
+    function showCode() {   
       Blockly.JavaScript.INFINITE_LOOP_TRAP = null;
       var code = Blockly.JavaScript.workspaceToCode(workspace);
       alert(code);
     }
 
+    // Generate JavaScript code and run it, prints the code to the console
     function runCode() {
-      // Generate JavaScript code and run it.
       var code = Blockly.JavaScript.workspaceToCode(workspace);
       window.console.log(code);
       LISTEN_FOR_START = false;
@@ -119,15 +115,16 @@
         alert(e);
       }
     }
+
+    //initialize recognition object as a global (for access in block code, especially for boolean block)
     var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
     var SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList;
     var SpeechRecognitionEvent = SpeechRecognitionEvent || webkitSpeechRecognitionEvent;
     var recognition = new SpeechRecognition();
     updateGrammars();
-    //ADD STUFF TO GRAMMARS
-
+    
+    //this can be updated to include different types of strings that we want to include
     function updateGrammars() {
-      LISTEN_FOR_START = true;
       var grammar = '#JSGF V1.0; grammar phrase; public <phrase> = red | green | blue ;';
       var speechRecognitionList = new SpeechGrammarList();
       speechRecognitionList.addFromString(grammar, 1);
@@ -137,26 +134,32 @@
       recognition.maxAlternatives = 1;
     }
 
+    //this is called on the "Start Listening", launches blockly code by listening (used for the blocks that trigger other pieces of code). If there is code that doesn't require talking to start, it immediatley executes that instead. 
+    //TODO: Determine if this is the design we want? How do we want to incorporate speech-launched blocks?
+    function listenStart() {
+      LISTEN_FOR_START = true;
+      listen();
+    }
+
+    //called by both listenStart() and by listenBool(), used by both blocks to start the speech recognition process and log it. Maybe not necessary, could just replace with a recognition.start() call.
     function listen() {
       recognition.start();
       window.console.log("Listening...");
     }
 
-    /*function stopListen() {
-      recognition.stop();
-      window.console.log("Done listening.");
-    } */
-
+    //Triggered when speech recognition is completed, logs results, and if the "Start Talking" button was pressed (LISTEN_FOR_START = true), then the corresponding root block is kicked off. Otherwise, resultWord is updated for use by the speech_bool block.
     recognition.onresult = function(event) {
-      window.console.log("Checking result.");
-      var speechResult = event.results[0][0].transcript;
-      window.console.log("You said: " + speechResult);
-      if (LISTEN_FOR_START)
-        startFromSpeech(speechResult);
-      else
-        resultWord = speechResult;
-    }
+        window.console.log("Checking result.");
+        var speechResult = event.results[0][0].transcript;
+        window.console.log("You said: " + speechResult);
+        if (LISTEN_FOR_START) //"start talking" was pressed, need to start root blocks
+          startFromSpeech(speechResult);
+        else
+          resultWord = speechResult;
+      }
 
+  
+    //Kick off the root blocks associated with the word spoken "speechResult". Called only if LISTEN_FOR_START = true
     function startFromSpeech(speechResult) {
       var topBlocksArr = workspace.getTopBlocks();
       window.console.log(topBlocksArr);
@@ -176,12 +179,12 @@
       window.console.log("No match found.");
     }
 
+    //called by the speech_bool block. Kind of a mess right now. Will probably change. Uses the listen() function like listenForStart()
     function listenForBool(speech) {
       resultWord = null;
       LISTEN_FOR_START = false;
       listen();
-      setTimeout(5000);
-      window.console.log("I'm back!");
+      return true;  //stub
 
       //while(!handled)   { //FIX!!!!!! hate doing this :(
           if (resultWord == speech) {
@@ -204,16 +207,14 @@
     }
     recognition.onerror = function(event) {
       window.console.log('Error occurred in recognition.');
-    }
-    /*recognition.onend = function() {
+    } 
+    recognition.onend = function() {
       window.console.log("Done listening.");
       recognition.stop();
-    } */
+    } 
 
 
-    /*function highlightBlock(id) {
-      workspace.highlightBlock(id);
-    }*/
+
 
   </script>
 
