@@ -84,11 +84,12 @@
 
     var LISTEN_FOR_START = true;
     var resultWord = null;
+    var recognizableWords = []; //keeps track of all the words that the recognizer should listen for
 
     var workspace = Blockly.inject('blocklyDiv',
         {media: '../../media/',
          toolbox: document.getElementById('toolbox')});
-    workspace.addChangeListener(updateCode);
+    //workspace.addChangeListener(updateCode);  //makes sure that the workspace code is always updated
     
 
     //updates the code in the workspace so it's ready to execute when called by listen or run code (most current dropdown speech choice). This is called on every change to the blockly workspace. Might be a better way to do this?
@@ -121,11 +122,29 @@
     var SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList;
     var SpeechRecognitionEvent = SpeechRecognitionEvent || webkitSpeechRecognitionEvent;
     var recognition = new SpeechRecognition();
-    updateGrammars();
     
+    //add a word that the recognizer should be able to recognize from the user. Called from block code
+    //TODO: Is there a good way to remove words after the user has changed them so that the grammar list doesn't get "clogged up" with words that are used and then changed? Is this worthwhile or unnecessary?
+    function addRecognizableWord(word) {
+      recognizableWords[recognizableWords.length] = word;
+    }
+
+    //Uses the recognizableWords to generate a string to give to the recognizer in updateGrammars.
+    function convertRecognizableWordsToString() {
+      var grammarString = '#JSGF V1.0; grammar phrase; public <phrase> = ';
+      if (recognizableWords.length > 0) {
+        grammarString += recognizableWords[0];
+      }
+      for (var i=1; i<recognizableWords.length; i++) {
+        grammarString += ' | ' + recognizableWords[i];
+      }
+      grammarString += ';';
+    }
+
     //this can be updated to include different types of strings that we want to include
     function updateGrammars() {
-      var grammar = '#JSGF V1.0; grammar phrase; public <phrase> = red | green | blue ;';
+      var grammar = convertRecognizableWordsToString();
+      //var grammar = '#JSGF V1.0; grammar phrase; public <phrase> = red | green | blue ;';
       var speechRecognitionList = new SpeechGrammarList();
       speechRecognitionList.addFromString(grammar, 1);
       recognition.grammars = speechRecognitionList;
@@ -137,12 +156,14 @@
     //this is called on the "Start Listening", launches blockly code by listening (used for the blocks that trigger other pieces of code). If there is code that doesn't require talking to start, it immediatley executes that instead. 
     //TODO: Determine if this is the design we want? How do we want to incorporate speech-launched blocks?
     function listenStart() {
+      updateCode();
       LISTEN_FOR_START = true;
       listen();
     }
 
     //called by both listenStart() and by listenBool(), used by both blocks to start the speech recognition process and log it. Maybe not necessary, could just replace with a recognition.start() call.
     function listen() {
+      updateGrammars();   //moved here instead of in initialization to account for if user wants to add options between runs
       recognition.start();
       window.console.log("Listening...");
     }
