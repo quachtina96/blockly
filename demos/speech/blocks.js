@@ -66,12 +66,12 @@ Blockly.JavaScript['mouse_click'] = function(block) {
 };
 
 
-Blockly.Blocks['listen_start'] = {	//need to figure out how to generalize for internationalization
+Blockly.Blocks['listen_start'] = {
   init: function() {
     this.appendDummyInput()
         .appendField("Listen for")
-        .appendField(new Blockly.FieldDropdown([["red", "red"], ["green", "green"], ["blue", "blue"]]), "SPEECH");
-     this.appendStatementInput("DO")
+        .appendField(new Blockly.FieldTextInput("your special word"), "SPEECH");
+    this.appendStatementInput("DO")
         .setCheck(null);
     this.setColour(260);
     this.setTooltip('');
@@ -82,6 +82,7 @@ Blockly.Blocks['listen_start'] = {	//need to figure out how to generalize for in
 Blockly.JavaScript['listen_start'] = function(block) {
   var speech = block.getFieldValue('SPEECH');
   block.data = speech;
+  addRecognizableWord(speech);
   window.console.log("Changed the data value: " + block.data);
   var code = '...;\n';
   return '';
@@ -100,7 +101,7 @@ Blockly.Blocks['listen_bool'] = {
   }
 };
 
-Blockly.JavaScript['listen_bool'] = function(block) {
+Blockly.JavaScript['listen_bool'] = function(block) { //this part is not currently working
   var dropdown_speech = block.getFieldValue('SPEECH');
   var code = 'listenForBool(\'' + dropdown_speech + '\') && (function() { while(resultWord==null) { if(\'' + dropdown_speech + '\' == resultWord) return true; else if (resultWord!=null) return false; } recognition.onresult = function(event) {window.console.log("Checking result."); var speechResult = event.results[0][0].transcript; window.console.log("You said: " + speechResult); resultWord = speechResult; return true;}}())';
   return [code, Blockly.JavaScript.ORDER_NONE];
