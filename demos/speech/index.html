@@ -23,8 +23,10 @@
   <script src="../../blocks/colour.js"></script>
   <script src="../../blocks/variables.js"></script>
   <script src="../../blocks/procedures.js"></script>
-  <script src="JS-Interpreter/acorn_interpreter.js"></script>
+  <script src="JS-Interpreter/acorn.js"></script>
+  <script src="JS-Interpreter/interpreter.js"></script>
   <script src="blocks.js"></script>
+    
   <style>
     html, body {
       height: 100%;
@@ -55,7 +57,8 @@
       <p>
         <button onclick="showCode()">Show JavaScript</button>   
         <button onclick="runCode()">Run JavaScript</button>
-        <button onclick="listenStart()">Start Talking</button>
+        <button onclick="listenStart()">Talk to Start</button>
+        <button onclick="listen()">Talk to Answer</button>
         <!--button onclick="stopListen()">Stop Talking</button-->
       </p>
 
@@ -64,8 +67,9 @@
   <xml id="toolbox" style="display: none">
     <category name="Emma's Fancy Blocks">
       <block type="listen_start"></block>
+      <block type="listen_if"></block>
       <block type="listen_bool"></block>
-      <block type="string_contains"></block>
+      <block type="listen_text"></block>
     </category>
     <category name="Usual">
       <block type="controls_if"></block>
@@ -83,12 +87,17 @@
   <script>
 
     var LISTEN_FOR_START = true;
-    var resultWord = null;
+    var resultWord = null;  //might not need this anymore
     var recognizableWords = []; //keeps track of all the words that the recognizer should listen for
+    var phrase_to_match = null;
+    var statements_to_do = null; 
+
+    var myInterpreter;
 
     var workspace = Blockly.inject('blocklyDiv',
         {media: '../../media/',
          toolbox: document.getElementById('toolbox')});
+
     //workspace.addChangeListener(updateCode);  //makes sure that the workspace code is always updated
     
 
@@ -105,23 +114,86 @@
       alert(code);
     }
 
+    //initialize recognition object as a global (for access in block code, especially for boolean block)
+    var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
+    var SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList;
+    var SpeechRecognitionEvent = SpeechRecognitionEvent ||webkitSpeechRecognitionEvent;
+    var recognition = new SpeechRecognition();
+
     // Generate JavaScript code and run it, prints the code to the console
     function runCode() {
       var code = Blockly.JavaScript.workspaceToCode(workspace);
       window.console.log(code);
       LISTEN_FOR_START = false;
-      try {
+
+      var initFunc = function(myInterpreter,scope) {
+
+        //alert
+        var wrapper = function(text) {
+          text = text ? text.toString() : '';
+          return myInterpreter.createPrimitive(alert(text));
+        };
+        myInterpreter.setProperty(scope, 'alert',
+            myInterpreter.createNativeFunction(wrapper));
+
+        //prompt -- not currently being used, might want to take out
+         wrapper = function(text) {
+            text = text ? text.toString() : '';
+            return myInterpreter.createPrimitive(prompt(text));
+          };
+          myInterpreter.setProperty(scope, 'prompt',
+              myInterpreter.createNativeFunction(wrapper));
+
+          //listen_branch
+        var wrapper = function listen_branch(word, callback) {
+          word = word ? word.toString() : '';
+          var localRecognizer = new SpeechRecognition();
+          updateGrammars(localRecognizer);
+          localRecognizer.start();
+          window.console.log("Listening");
+          localRecognizer.onresult = function() {
+              window.console.log("Checking result.");
+              var speechResult = event.results[0][0].transcript;
+              window.console.log("You said: " + speechResult);
+              callback(myInterpreter.createPrimitive(speechResult == word));
+          };
+        };
+        myInterpreter.setProperty(scope,'listen_branch', myInterpreter.createAsyncFunction(wrapper));
+
+        //listen_text
+        var wrapper = function listen_text(callback) {
+          var localRecognizer = new SpeechRecognition();
+          updateGrammars(localRecognizer);
+          localRecognizer.start();
+          window.console.log("Listening");
+          localRecognizer.onresult = function() {
+              window.console.log("Checking result.");
+              var speechResult = event.results[0][0].transcript;
+              window.console.log("You said: " + speechResult);
+              callback(myInterpreter.createPrimitive(speechResult));
+          };
+        };
+        myInterpreter.setProperty(scope,'listen_text', myInterpreter.createAsyncFunction(wrapper));
+
+      };
+      myInterpreter = new Interpreter(code,initFunc);
+      runButton();
+      /*try {
         eval(code);
       } catch(e) {
         alert(e);
-      }
+      }*/
     }
 
-    //initialize recognition object as a global (for access in block code, especially for boolean block)
-    var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
-    var SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList;
-    var SpeechRecognitionEvent = SpeechRecognitionEvent || webkitSpeechRecognitionEvent;
-    var recognition = new SpeechRecognition();
+    function runButton() {
+      if (myInterpreter.run()) {
+        // Ran until an async call.  Give this call a chance to run.
+        // Then start running again later.
+        // 1000ms is waaay too long, but is used here to demo the pause.
+        setTimeout(runButton, 100);
+      }
+    }
+    
     
     //add a word that the recognizer should be able to recognize from the user. Called from block code
     //TODO: Is there a good way to remove words after the user has changed them so that the grammar list doesn't get "clogged up" with words that are used and then changed? Is this worthwhile or unnecessary?
@@ -142,28 +214,36 @@
     }
 
     //this can be updated to include different types of strings that we want to include
-    function updateGrammars() {
+    function updateGrammars(myRecognizer) {
       var grammar = convertRecognizableWordsToString();
       //var grammar = '#JSGF V1.0; grammar phrase; public <phrase> = red | green | blue ;';
       var speechRecognitionList = new SpeechGrammarList();
       speechRecognitionList.addFromString(grammar, 1);
-      recognition.grammars = speechRecognitionList;
-      recognition.lang = 'en-US';
-      recognition.interimResults = false;
-      recognition.maxAlternatives = 1;
+      myRecognizer.grammars = speechRecognitionList;
+      myRecognizer.lang = 'en-US';
+      myRecognizer.interimResults = false;
+      myRecognizer.maxAlternatives = 1;
     }
 
-    //this is called on the "Start Listening", launches blockly code by listening (used for the blocks that trigger other pieces of code). If there is code that doesn't require talking to start, it immediatley executes that instead. 
+    //this is called on the "Talk to Start", launches blockly code by listening (used for the blocks that trigger other pieces of code). If there is code that doesn't require talking to start, it immediatley executes that instead. 
     //TODO: Determine if this is the design we want? How do we want to incorporate speech-launched blocks?
     function listenStart() {
-      updateCode();
       LISTEN_FOR_START = true;
       listen();
     }
 
+    //Used for the branching block, executes statements if the word the user speaks == phrase. Waits for the user to press "Talk to Answer"
+    function listenIf(phrase, statements) {
+      phrase_to_match = phrase;
+      statements_to_do = statements;
+      LISTEN_FOR_START = false;
+      window.console.log("Press \"Talk to Answer\" to start talking and proceed.");
+    }
+
     //called by both listenStart() and by listenBool(), used by both blocks to start the speech recognition process and log it. Maybe not necessary, could just replace with a recognition.start() call.
     function listen() {
-      updateGrammars();   //moved here instead of in initialization to account for if user wants to add options between runs
+      updateCode();
+      updateGrammars(recognition);   //moved here instead of in initialization to account for if user wants to add options between runs
       recognition.start();
       window.console.log("Listening...");
     }
@@ -176,7 +256,12 @@
         if (LISTEN_FOR_START) //"start talking" was pressed, need to start root blocks
           startFromSpeech(speechResult);
         else
-          resultWord = speechResult;
+          continueFromSpeech(speechResult);
+      }
+
+      function continueFromSpeech(speechResult) {
+        if (speechResult == phrase_to_match)
+          eval(statements_to_do);
       }
 
   
