@@ -1,71 +1,3 @@
-
-
-Blockly.Blocks['string_reverse'] = {
-  init: function() {
-    this.appendValueInput("STRING")
-        .setCheck("String")
-        .appendField("Reverse of");
-    this.setOutput(true, "String");
-    this.setColour(285);
-    this.setTooltip('');
-    this.setHelpUrl('http://www.example.com/');
-  }
-};
-
-Blockly.JavaScript['string_reverse'] = function(block) {
-  var value_string = Blockly.JavaScript.valueToCode(block, 'STRING', Blockly.JavaScript.ORDER_ATOMIC);
-  // TODO: Assemble JavaScript into code variable.
-  var code = value_string + '.reverse()';
-  // TODO: Change ORDER_NONE to the correct strength.
-  return [code, Blockly.JavaScript.ORDER_NONE];
-};
-
-Blockly.Blocks['string_contains'] = {
-  init: function() {
-    this.appendValueInput("BIGSTRING")
-        .setCheck("String");
-    this.appendValueInput("SUBSTR")
-        .setCheck("String")
-        .appendField("contains");
-    this.setInputsInline(true);
-    this.setOutput(true, "Boolean");
-    this.setColour(285);
-    this.setTooltip('');
-    this.setHelpUrl('http://www.example.com/');
-  }
-};
-
-Blockly.JavaScript['string_contains'] = function(block) {
-  var value_string = Blockly.JavaScript.valueToCode(block, 'BIGSTRING', Blockly.JavaScript.ORDER_ATOMIC);
-  var value_substr = Blockly.JavaScript.valueToCode(block, 'SUBSTR', Blockly.JavaScript.ORDER_ATOMIC);
-  var code = value_string + '.includes(' + value_substr + ')';
-  // TODO: Change ORDER_NONE to the correct strength.
-  return [code, Blockly.JavaScript.ORDER_NONE];
-};
-
-Blockly.Blocks['mouse_click'] = {
-  init: function() {
-    this.appendDummyInput()
-        .appendField("on mouse click");
-    this.setNextStatement(true, null);
-    this.setColour(20);
-    this.setTooltip('');
-    this.setHelpUrl('http://www.example.com/');
-  }, 
-  onchange: function() {
-  	alert("Boo! Gotcha.");
-  }
-};
-
-
-Blockly.JavaScript['mouse_click'] = function(block) {
-  // TODO: Assemble JavaScript into code variable.
-  //var code = '...;\n';
-  //return code;
-  return '';
-};
-
-
 Blockly.Blocks['listen_start'] = {
   init: function() {
     this.appendDummyInput()
@@ -107,5 +39,50 @@ Blockly.JavaScript['listen_bool'] = function(block) { //this part is not current
   return [code, Blockly.JavaScript.ORDER_NONE];
 };
 
+//speech_speak block links to a String input and says the String aloud upon execution
+Blockly.Blocks['speech_speak'] = {
+  init: function() {
+    this.appendValueInput("TO_SAY")
+        .setCheck("String")
+        .appendField("Say");
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(230);
+    this.setTooltip('');
+    this.setHelpUrl('http://www.example.com/');
+  }
+};
 
-//
+Blockly.JavaScript['speech_speak'] = function(block) {
+  var value_to_say = Blockly.JavaScript.valueToCode(block, 'TO_SAY', Blockly.JavaScript.ORDER_ATOMIC);
+  var code;
+  if (value_to_say !== '' && value_to_say !== null){
+    code = 'say(' + value_to_say + ');\n';
+  }  
+  else{
+    code = '\n';
+  }
+  return code;
+};
+
+//writes to display
+Blockly.Blocks['display_text'] = {
+  init: function() {
+    this.appendValueInput("DISPLAY_TEXT")
+        .setCheck("String")
+        .appendField("Write");
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(260);
+    this.setTooltip('');
+    this.setHelpUrl('http://www.example.com/');
+  }
+};
+
+//takes in the user's text from the block and shows it on the screen.
+Blockly.JavaScript['display_text'] = function(block) {
+  var value_display_text = Blockly.JavaScript.valueToCode(block, 'DISPLAY_TEXT', Blockly.JavaScript.ORDER_ATOMIC);
+  console.log(value_display_text);
+  var code = "updateTextDisplay(" + value_display_text + ");\n";
+  return code;
+};

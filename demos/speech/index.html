@@ -23,7 +23,8 @@
   <script src="../../blocks/colour.js"></script>
   <script src="../../blocks/variables.js"></script>
   <script src="../../blocks/procedures.js"></script>
-  <script src="JS-Interpreter/acorn_interpreter.js"></script>
+  <script src="JS-Interpreter/acorn.js"></script>
+  <script src="JS-Interpreter/interpreter.js"></script>
   <script src="blocks.js"></script>
   <style>
     html, body {
@@ -58,6 +59,7 @@
         <button onclick="listenStart()">Start Talking</button>
         <!--button onclick="stopListen()">Stop Talking</button-->
       </p>
+      <p id="displayText"> Your story's text will be shown here.</p>
 
   <div id="blocklyDiv" style="height: 480px; width: 900px;""></div>
 
@@ -65,7 +67,6 @@
     <category name="Emma's Fancy Blocks">
       <block type="listen_start"></block>
       <block type="listen_bool"></block>
-      <block type="string_contains"></block>
     </category>
     <category name="Usual">
       <block type="controls_if"></block>
@@ -77,6 +78,10 @@
     <category name="Text">
       <block type="text"></block>
       <block type="text_print"></block>
+    </category>
+    <category name="Tina's Blocks">
+      <block type="speech_speak"></block>
+      <block type="display_text"></block>
     </category>
   </xml>
 
@@ -105,17 +110,18 @@
       alert(code);
     }
 
+    // DEPRECATED 
     // Generate JavaScript code and run it, prints the code to the console
-    function runCode() {
-      var code = Blockly.JavaScript.workspaceToCode(workspace);
-      window.console.log(code);
-      LISTEN_FOR_START = false;
-      try {
-        eval(code);
-      } catch(e) {
-        alert(e);
-      }
-    }
+    // function runCode() {
+    //   var code = Blockly.JavaScript.workspaceToCode(workspace);
+    //   window.console.log(code);
+    //   LISTEN_FOR_START = false;
+    //   try {
+    //     eval(code);
+    //   } catch(e) {
+    //     alert(e);
+    //   }
+    // }
 
     //initialize recognition object as a global (for access in block code, especially for boolean block)
     var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
@@ -234,6 +240,101 @@
       recognition.stop();
     } 
 
+  //SPEECH SYNTHESIS INITIALIZATION
+  var msg = new SpeechSynthesisUtterance();
+  var voices = window.speechSynthesis.getVoices();
+
+  var say = function(wordsToSay){
+    if ('speechSynthesis' in window) {
+    //msg = new SpeechSynthesisUtterance(wordsToSay);
+      msg.text = wordsToSay
+      window.speechSynthesis.speak(msg);
+    // Synthesis support. Make your web apps talk!
+    } else {
+      console.log("speechSynthesis not found. Text to speech capability under Web Speech API not supported.")
+    }
+  };
+
+  msg.onend = function(e) {
+  console.log('Finished in ' + event.elapsedTime + ' seconds.');
+  };
+
+  //TODO(quacht): add capability (new param called 'opt_append') for optionally appending the text rather than replacing it?
+  var updateTextDisplay = function(newText){
+    document.getElementById('displayText').textContent = newText;
+  };
+
+  //current implementation uses JSInterpreter to wait for the API calls to return a result before
+  //executing code
+  var myInterpreter;
+  function runCode() {
+      var code = Blockly.JavaScript.workspaceToCode(workspace);
+      window.console.log(code);
+      LISTEN_FOR_START = false;
+
+      var initFunc = function(myInterpreter,scope) {
+        //myInterpreter.setProperty(scope,'matchWord',myInterpreter.createPrimitive(location.toString()));    //???? need something for word and statements? what does this do?
+
+        var wrapper = function(text) {
+          text = text ? text.toString() : '';
+          return myInterpreter.createPrimitive(alert(text));
+        };
+        myInterpreter.setProperty(scope, 'alert',
+            myInterpreter.createNativeFunction(wrapper));
+
+
+        var wrapper = function listen_branch(word, callback) {
+          word = word ? word.toString() : '';
+          var localRecognizer = new SpeechRecognition();
+          updateGrammars(localRecognizer);
+          localRecognizer.start();
+          window.console.log("Listening");
+          localRecognizer.onresult = function() {
+              window.console.log("Checking result.");
+              var speechResult = event.results[0][0].transcript;
+              window.console.log("You said: " + speechResult);
+              callback(myInterpreter.createPrimitive(speechResult == word));
+          };
+        };
+        myInterpreter.setProperty(scope,'listen_branch', myInterpreter.createAsyncFunction(wrapper));
+
+        //wraps function for text to speech
+        var wrapper = function say(wordsToSay, callback){
+          wordsToSay = wordsToSay ? wordsToSay.toString() : '';
+          if ('speechSynthesis' in window) {
+            localMsg = new SpeechSynthesisUtterance(wordsToSay);
+            window.speechSynthesis.speak(localMsg);
+          // Synthesis support. Make your web apps talk!
+          } else {
+            console.log("speechSynthesis not found. Text to speech capability under Web Speech API not supported.")
+          }
+          localMsg.onend = function(e) {
+            callback();
+          };
+        };
+        myInterpreter.setProperty(scope, 'say', myInterpreter.createAsyncFunction(wrapper));
+
+        //wraps function for displayingText
+        var wrapper = function updateTextDisplay(text) {
+          text = text ? text.toString() : '';
+          return myInterpreter.createPrimitive(document.getElementById('displayText').textContent = text);
+        };
+        myInterpreter.setProperty(scope, 'updateTextDisplay',
+            myInterpreter.createNativeFunction(wrapper));
+
+        };
+      myInterpreter = new Interpreter(code,initFunc);
+      runButton();
+    }
+
+    function runButton() {
+      if (myInterpreter.run()) {
+        // Ran until an async call.  Give this call a chance to run.
+        // Then start running again later.
+        // 1000ms is waaay too long, but is used here to demo the pause.
+        setTimeout(runButton, 100);
+      }
+    }
 
 
 
