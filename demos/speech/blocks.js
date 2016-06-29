@@ -79,6 +79,46 @@ Blockly.JavaScript['listen_text'] = function(block) {
   return [code, Blockly.JavaScript.ORDER_NONE];
 };
 
+Blockly.Blocks['display_img'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("Display image at")
+        .appendField(new Blockly.FieldTextInput("this link"), "IMG_SRC");
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(330);
+    this.setTooltip('');
+    this.setHelpUrl('http://www.example.com/');
+  }
+};
+
+Blockly.JavaScript['display_img'] = function(block) {
+  var text_img_src = block.getFieldValue('IMG_SRC');
+  var code = 'displayImage('+Blockly.JavaScript.quote_(text_img_src)+');\n';
+  return code;
+};
+
+Blockly.Blocks['display_pause'] = {
+  init: function() {
+    this.appendValueInput("TIME")
+        .setCheck("Number")
+        .appendField("Pause for");
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(330);
+    this.setTooltip('');
+    this.setHelpUrl('http://www.example.com/');
+  }
+};
+
+
+Blockly.JavaScript['display_pause'] = function(block) {
+  var value_time = Blockly.JavaScript.valueToCode(block, 'TIME', Blockly.JavaScript.ORDER_ATOMIC);
+  // TODO: Assemble JavaScript into code variable.
+  var code = 'pause('+value_time+');\n';
+  return code;
+};
+
 /*
 Blockly.Blocks['listen_prompt'] = {
   init: function() {

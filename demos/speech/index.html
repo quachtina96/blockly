@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Blockly Demo: Speech Blockly</title>
+  <title>Blockly Demo: Adventure Blockly</title>
   <script src="../../blockly_uncompressed.js"></script>
   <script src="../../generators/javascript.js"></script>
   <script src="../../generators/javascript/logic.js"></script>
@@ -41,6 +41,14 @@
       font-weight: normal;
       font-size: 140%;
     }
+    section {
+      float: left;
+      width : 70%;
+    }
+    aside {
+      float: right;
+      width: 30%;
+    }
   </style>
 </head>
 <body>
@@ -48,11 +56,11 @@
   <tr>
    <td>
     <h1><a href="https://developers.google.com/blockly/">Blockly</a> &gt;
-      <a href="../index.html">Demos</a> &gt; Speech Blockly</h1>
+      <a href="../index.html">Demos</a> &gt; Adventure Blockly</h1>
 
-      <p>Playing around to see if this works.</p>
+      <p>Make your own adventure through text, speech, and pictures. Create your own or check out some of our examples (link).</p>
 
-      <p>&rarr; More info on <a href="https://developers.google.com/blockly/guides/configure-blockly/web/fixed-size">injecting fixed-sized Blockly</a>&hellip;</p>
+      <p id = "logText">This is where logging messages go.</p>
 
       <p>
         <button onclick="showCode()">Show JavaScript</button>   
@@ -61,17 +69,27 @@
         <button onclick="listen()">Talk to Answer</button>
         <!--button onclick="stopListen()">Stop Talking</button-->
       </p>
+  <aside>
+       <p id="displayText"> Your story's text will be shown here.</p>
 
-  <div id="blocklyDiv" style="height: 480px; width: 900px;""></div>
+       <img id = "displayPic" src = "http://cdn3-www.cattime.com/assets/uploads/2011/08/best-kitten-names-1.jpg" alt="Image chosen by user" style = "width:40%;height:40%;">
+  </aside>
+
+  <section id="blocklyDiv" style= "height: 480px; width: 900px;"></div>    
 
   <xml id="toolbox" style="display: none">
-    <category name="Emma's Fancy Blocks">
+    <category name="Listen">
       <block type="listen_start"></block>
       <block type="listen_if"></block>
       <block type="listen_bool"></block>
       <block type="listen_text"></block>
     </category>
+    <category name="Display">
+      <block type="display_img"></block>
+      <block type="display_pause"></block>
+    </category>
     <category name="Usual">
+      <block type="math_number"></block>
       <block type="controls_if"></block>
       <block type="logic_compare"></block>
       <block type="controls_repeat_ext"></block>
@@ -83,6 +101,7 @@
       <block type="text_print"></block>
     </category>
   </xml>
+  </section>
 
   <script>
 
@@ -94,7 +113,7 @@
 
     var myInterpreter;
 
-    var workspace = Blockly.inject('blocklyDiv',
+    var workspace = Blockly.inject('blocklyDiv',   //used to be blocklyDiv
         {media: '../../media/',
          toolbox: document.getElementById('toolbox')});
 
@@ -174,6 +193,28 @@
           };
         };
         myInterpreter.setProperty(scope,'listen_text', myInterpreter.createAsyncFunction(wrapper));
+
+        //display_img
+        var wrapper = function(url) {
+          url = url ? url.toString() : '';
+          return myInterpreter.createPrimitive(window.document.getElementById('displayPic').src = url);
+        };
+        myInterpreter.setProperty(scope, 'displayImage',
+            myInterpreter.createNativeFunction(wrapper));
+
+        //pause
+        var wrapper = function(time,callback) {
+          time = time ? time.toString() : '';
+          timeVar = parseInt(time);
+          window.console.log(timeVar);  
+          var resume = function() {
+            window.console.log("Back!");
+            callback();
+          };
+          return myInterpreter.createPrimitive(window.setTimeout(resume,timeVar));
+        };
+        myInterpreter.setProperty(scope, 'pause',
+            myInterpreter.createAsyncFunction(wrapper));
 
       };
       myInterpreter = new Interpreter(code,initFunc);
