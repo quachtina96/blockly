@@ -1,71 +1,4 @@
 
-
-Blockly.Blocks['string_reverse'] = {
-  init: function() {
-    this.appendValueInput("STRING")
-        .setCheck("String")
-        .appendField("Reverse of");
-    this.setOutput(true, "String");
-    this.setColour(285);
-    this.setTooltip('');
-    this.setHelpUrl('http://www.example.com/');
-  }
-};
-
-Blockly.JavaScript['string_reverse'] = function(block) {
-  var value_string = Blockly.JavaScript.valueToCode(block, 'STRING', Blockly.JavaScript.ORDER_ATOMIC);
-  // TODO: Assemble JavaScript into code variable.
-  var code = value_string + '.reverse()';
-  // TODO: Change ORDER_NONE to the correct strength.
-  return [code, Blockly.JavaScript.ORDER_NONE];
-};
-
-Blockly.Blocks['string_contains'] = {
-  init: function() {
-    this.appendValueInput("BIGSTRING")
-        .setCheck("String");
-    this.appendValueInput("SUBSTR")
-        .setCheck("String")
-        .appendField("contains");
-    this.setInputsInline(true);
-    this.setOutput(true, "Boolean");
-    this.setColour(285);
-    this.setTooltip('');
-    this.setHelpUrl('http://www.example.com/');
-  }
-};
-
-Blockly.JavaScript['string_contains'] = function(block) {
-  var value_string = Blockly.JavaScript.valueToCode(block, 'BIGSTRING', Blockly.JavaScript.ORDER_ATOMIC);
-  var value_substr = Blockly.JavaScript.valueToCode(block, 'SUBSTR', Blockly.JavaScript.ORDER_ATOMIC);
-  var code = value_string + '.includes(' + value_substr + ')';
-  // TODO: Change ORDER_NONE to the correct strength.
-  return [code, Blockly.JavaScript.ORDER_NONE];
-};
-
-Blockly.Blocks['mouse_click'] = {
-  init: function() {
-    this.appendDummyInput()
-        .appendField("on mouse click");
-    this.setNextStatement(true, null);
-    this.setColour(20);
-    this.setTooltip('');
-    this.setHelpUrl('http://www.example.com/');
-  }, 
-  onchange: function() {
-  	alert("Boo! Gotcha.");
-  }
-};
-
-
-Blockly.JavaScript['mouse_click'] = function(block) {
-  // TODO: Assemble JavaScript into code variable.
-  //var code = '...;\n';
-  //return code;
-  return '';
-};
-
-
 Blockly.Blocks['listen_start'] = {
   init: function() {
     this.appendDummyInput()
@@ -84,28 +17,89 @@ Blockly.JavaScript['listen_start'] = function(block) {
   block.data = speech;
   addRecognizableWord(speech);
   window.console.log("Changed the data value: " + block.data);
-  var code = '...;\n';
   return '';
 };
 
-
-Blockly.Blocks['listen_bool'] = {
+Blockly.Blocks['listen_if'] = {
   init: function() {
     this.appendDummyInput()
-        .appendField("you say")
-        .appendField(new Blockly.FieldDropdown([["red", "red"], ["green", "green"], ["blue", "blue"]]), "SPEECH");
-    this.setOutput(true, "Boolean");
-    this.setColour(210);
+        .appendField("If you say")
+        .appendField(new Blockly.FieldTextInput("your special word"), "WORD");
+    this.appendStatementInput("DO")
+        .setCheck(null);
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(260);
     this.setTooltip('');
     this.setHelpUrl('http://www.example.com/');
   }
 };
 
-Blockly.JavaScript['listen_bool'] = function(block) { //this part is not currently working
-  var dropdown_speech = block.getFieldValue('SPEECH');
-  var code = 'listenForBool(\'' + dropdown_speech + '\') && (function() { while(resultWord==null) { if(\'' + dropdown_speech + '\' == resultWord) return true; else if (resultWord!=null) return false; } recognition.onresult = function(event) {window.console.log("Checking result."); var speechResult = event.results[0][0].transcript; window.console.log("You said: " + speechResult); resultWord = speechResult; return true;}}())';
+Blockly.JavaScript['listen_if'] = function(block) {
+    var text_word = block.getFieldValue('WORD');
+    var statements_do = Blockly.JavaScript.statementToCode(block, 'DO');
+    addRecognizableWord(text_word);
+    //listenIf(text_word,statements_do);  //trying different approach
+    return 'if (listen_branch('+Blockly.JavaScript.quote_(text_word)+')) {\n' + statements_do + '}\n';
+};
+
+Blockly.Blocks['listen_bool'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("you say")
+        .appendField(new Blockly.FieldTextInput("your special word"), "WORD");
+    this.setOutput(true, null);
+    this.setColour(260);
+    this.setTooltip('');
+    this.setHelpUrl('http://www.example.com/');
+  }
+};
+
+Blockly.JavaScript['listen_bool'] = function(block) {
+    var text_word = block.getFieldValue('WORD');
+    addRecognizableWord(text_word);
+    //listenIf(text_word,statements_do);  //trying different approach
+    var code = 'listen_branch('+Blockly.JavaScript.quote_(text_word)+')';
+    return [code, Blockly.JavaScript.ORDER_ATOMIC];
+};
+
+Blockly.Blocks['listen_text'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("what you say");
+    this.setOutput(true, "String");
+    this.setColour(260);
+    this.setTooltip('');
+    this.setHelpUrl('http://www.example.com/');
+  }
+};
+
+Blockly.JavaScript['listen_text'] = function(block) {
+  var code = 'listen_text()';
   return [code, Blockly.JavaScript.ORDER_NONE];
 };
 
+/*
+Blockly.Blocks['listen_prompt'] = {
+  init: function() {
+    this.appendValueInput("PROMPT")
+        .setCheck("String")
+        .appendField("Ask");
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(260);
+    this.setTooltip('');
+    this.setHelpUrl('http://www.example.com/');
+  }
+};
+
+
+Blockly.JavaScript['listen_prompt'] = function(block) {
+  var value_prompt = Blockly.JavaScript.valueToCode(block, 'PROMPT', Blockly.JavaScript.ORDER_ATOMIC);
+  // TODO: Assemble JavaScript into code variable.
+  var code = 'alert(' + Blockly.JavaScript.quote_(value_prompt) + ');';
+  return code;
+};
+*/
 
 //
