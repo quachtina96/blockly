@@ -1,4 +1,3 @@
-
 Blockly.Blocks['listen_start'] = {
   init: function() {
     this.appendDummyInput()
@@ -132,14 +131,53 @@ Blockly.Blocks['listen_prompt'] = {
     this.setHelpUrl('http://www.example.com/');
   }
 };
-
-
-Blockly.JavaScript['listen_prompt'] = function(block) {
-  var value_prompt = Blockly.JavaScript.valueToCode(block, 'PROMPT', Blockly.JavaScript.ORDER_ATOMIC);
-  // TODO: Assemble JavaScript into code variable.
-  var code = 'alert(' + Blockly.JavaScript.quote_(value_prompt) + ');';
-  return code;
-};
 */
 
-//
+//speech_speak block links to a String input and says the String aloud upon execution
+Blockly.Blocks['speech_speak'] = {
+  init: function() {
+    this.appendValueInput("TO_SAY")
+        .setCheck("String")
+        .appendField("Say");
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(230);
+    this.setTooltip('');
+    this.setHelpUrl('http://www.example.com/');
+  }
+};
+
+Blockly.JavaScript['speech_speak'] = function(block) {
+  var value_to_say = Blockly.JavaScript.valueToCode(block, 'TO_SAY', Blockly.JavaScript.ORDER_ATOMIC);
+  var code;
+  if (value_to_say !== '' && value_to_say !== null){
+    code = 'say(' + value_to_say + ');\n';
+  }  
+  else{
+    code = '\n';
+  }
+  return code;
+};
+
+//writes to display
+Blockly.Blocks['display_text'] = {
+  init: function() {
+    this.appendValueInput("DISPLAY_TEXT")
+        .setCheck("String")
+        .appendField("Write");
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(260);
+    this.setTooltip('');
+    this.setHelpUrl('http://www.example.com/');
+  }
+};
+
+
+//takes in the user's text from the block and shows it on the screen.
+Blockly.JavaScript['display_text'] = function(block) {
+  var value_display_text = Blockly.JavaScript.valueToCode(block, 'DISPLAY_TEXT', Blockly.JavaScript.ORDER_ATOMIC);
+  console.log(value_display_text);
+  var code = "updateTextDisplay(" + value_display_text + ");\n";
+  return code;
+};
