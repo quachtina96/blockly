@@ -1,24 +1,4 @@
-Blockly.Blocks['listen_start'] = {
-  init: function() {
-    this.appendDummyInput()
-        .appendField("Listen for")
-        .appendField(new Blockly.FieldTextInput("your special word"), "SPEECH");
-    this.appendStatementInput("DO")
-        .setCheck(null);
-    this.setColour(260);
-    this.setTooltip('');
-    this.setHelpUrl('http://www.example.com/');
-  }
-};
-
-Blockly.JavaScript['listen_start'] = function(block) {
-  var speech = block.getFieldValue('SPEECH');
-  block.data = speech;
-  addRecognizableWord(speech);
-  window.console.log("Changed the data value: " + block.data);
-  return '';
-};
-
+//listen_if block executes a set of statements if the user says a specified word (entered in a text field)
 Blockly.Blocks['listen_if'] = {
   init: function() {
     this.appendDummyInput()
@@ -38,10 +18,10 @@ Blockly.JavaScript['listen_if'] = function(block) {
     var text_word = block.getFieldValue('WORD');
     var statements_do = Blockly.JavaScript.statementToCode(block, 'DO');
     addRecognizableWord(text_word);
-    //listenIf(text_word,statements_do);  //trying different approach
     return 'if (listen_branch('+Blockly.JavaScript.quote_(text_word)+')) {\n' + statements_do + '}\n';
 };
 
+//listen_bool returns a boolean value, true if the user says a specified word and false otherwise
 Blockly.Blocks['listen_bool'] = {
   init: function() {
     this.appendDummyInput()
@@ -57,11 +37,11 @@ Blockly.Blocks['listen_bool'] = {
 Blockly.JavaScript['listen_bool'] = function(block) {
     var text_word = block.getFieldValue('WORD');
     addRecognizableWord(text_word);
-    //listenIf(text_word,statements_do);  //trying different approach
     var code = 'listen_branch('+Blockly.JavaScript.quote_(text_word)+')';
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
+//listen_text returns a String containing what the user said
 Blockly.Blocks['listen_text'] = {
   init: function() {
     this.appendDummyInput()
@@ -78,6 +58,8 @@ Blockly.JavaScript['listen_text'] = function(block) {
   return [code, Blockly.JavaScript.ORDER_NONE];
 };
 
+//display_img displays an image in a section of the page using the provided link
+//TODO(edauterman): Is this a security problem?
 Blockly.Blocks['display_img'] = {
   init: function() {
     this.appendDummyInput()
@@ -97,6 +79,7 @@ Blockly.JavaScript['display_img'] = function(block) {
   return code;
 };
 
+//display_pause pauses execution for TIME (given in miliseconds)
 Blockly.Blocks['display_pause'] = {
   init: function() {
     this.appendValueInput("TIME")
@@ -113,25 +96,9 @@ Blockly.Blocks['display_pause'] = {
 
 Blockly.JavaScript['display_pause'] = function(block) {
   var value_time = Blockly.JavaScript.valueToCode(block, 'TIME', Blockly.JavaScript.ORDER_ATOMIC);
-  // TODO: Assemble JavaScript into code variable.
   var code = 'pause('+value_time+');\n';
   return code;
 };
-
-/*
-Blockly.Blocks['listen_prompt'] = {
-  init: function() {
-    this.appendValueInput("PROMPT")
-        .setCheck("String")
-        .appendField("Ask");
-    this.setPreviousStatement(true, null);
-    this.setNextStatement(true, null);
-    this.setColour(260);
-    this.setTooltip('');
-    this.setHelpUrl('http://www.example.com/');
-  }
-};
-*/
 
 //speech_speak block links to a String input and says the String aloud upon execution
 Blockly.Blocks['speech_speak'] = {
@@ -172,7 +139,6 @@ Blockly.Blocks['display_text'] = {
     this.setHelpUrl('http://www.example.com/');
   }
 };
-
 
 //takes in the user's text from the block and shows it on the screen.
 Blockly.JavaScript['display_text'] = function(block) {
