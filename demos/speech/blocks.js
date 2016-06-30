@@ -119,12 +119,16 @@ Blockly.JavaScript['speech_speak'] = function(block) {
   return code;
 };
 
-//writes to display
-Blockly.Blocks['display_text'] = {
+
+//updates the displayText div by either replacing or appending to current text.
+Blockly.Blocks['display_update_text'] = {
   init: function() {
-    this.appendValueInput("DISPLAY_TEXT")
+    this.appendValueInput("UPDATE_TEXT")
         .setCheck("String")
         .appendField("Write");
+    this.appendDummyInput()
+        .appendField("by")
+        .appendField(new Blockly.FieldDropdown([["replacing old text.", "REPLACE"], ["adding to old text.", "APPEND"]]), "WRITETYPE");
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour(260);
@@ -133,11 +137,30 @@ Blockly.Blocks['display_text'] = {
   }
 };
 
+Blockly.JavaScript['display_update_text'] = function(block) {
+  var value_update_text = Blockly.JavaScript.valueToCode(block, 'UPDATE_TEXT', Blockly.JavaScript.ORDER_ATOMIC);
+  var dropdown_name = block.getFieldValue('WRITETYPE');
+  var code = 'if( ' + Blockly.JavaScript.quote_(dropdown_name) + ' == "REPLACE"){\
+      clearText("textArea");\
+      }\
+      appendText("p", '+ value_update_text + ',"textArea");\n';
+  return code;
+};
 
-//takes in the user's text from the block and shows it on the screen.
-Blockly.JavaScript['display_text'] = function(block) {
-  var value_display_text = Blockly.JavaScript.valueToCode(block, 'DISPLAY_TEXT', Blockly.JavaScript.ORDER_ATOMIC);
-  console.log(value_display_text);
-  var code = "updateTextDisplay(" + value_display_text + ");\n";
+Blockly.Blocks['display_clear_text'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("Clear all text.");
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(260);
+    this.setTooltip('');
+    this.setHelpUrl('http://www.example.com/');
+  }
+};
+
+Blockly.JavaScript['display_clear_text'] = function(block) {
+  // TODO: Assemble JavaScript into code variable.
+  var code = 'clearText("textArea");\n';
   return code;
 };
