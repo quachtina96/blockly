@@ -1,9 +1,9 @@
 //listen_if block executes a set of statements if the user says a specified word (entered in a text field)
 Blockly.Blocks['listen_if'] = {
   init: function() {
-    this.appendDummyInput()
-        .appendField("If you say")
-        .appendField(new Blockly.FieldTextInput("your special word"), "WORD");
+    this.appendValueInput("WORD")
+        .setCheck("String")
+        .appendField("If you say");
     this.appendStatementInput("DO")
         .setCheck(null);
     this.setPreviousStatement(true, null);
@@ -15,18 +15,18 @@ Blockly.Blocks['listen_if'] = {
 };
 
 Blockly.JavaScript['listen_if'] = function(block) {
-    var text_word = block.getFieldValue('WORD');
+    var text_word = Blockly.JavaScript.valueToCode(block, 'WORD', Blockly.JavaScript.ORDER_ATOMIC);
     var statements_do = Blockly.JavaScript.statementToCode(block, 'DO');
     addRecognizableWord(text_word);
-    return 'if (listen_branch('+Blockly.JavaScript.quote_(text_word)+')) {\n' + statements_do + '}\n';
+    return 'if (listen_branch('+text_word+')) {\n' + statements_do + '}\n';
 };
 
 //listen_bool returns a boolean value, true if the user says a specified word and false otherwise
 Blockly.Blocks['listen_bool'] = {
   init: function() {
-    this.appendDummyInput()
-        .appendField("you say")
-        .appendField(new Blockly.FieldTextInput("your special word"), "WORD");
+    this.appendValueInput("WORD")
+        .setCheck("String")
+        .appendField("you say");
     this.setOutput(true, null);
     this.setColour(260);
     this.setTooltip('');
@@ -35,7 +35,7 @@ Blockly.Blocks['listen_bool'] = {
 };
 
 Blockly.JavaScript['listen_bool'] = function(block) {
-    var text_word = block.getFieldValue('WORD');
+    var text_word = Blockly.JavaScript.valueToCode(block, 'WORD', Blockly.JavaScript.ORDER_ATOMIC);
     addRecognizableWord(text_word);
     var code = 'listen_branch('+Blockly.JavaScript.quote_(text_word)+')';
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
