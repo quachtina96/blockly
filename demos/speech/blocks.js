@@ -8,7 +8,7 @@ Blockly.Blocks['listen_if'] = {
         .setCheck(null);
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
-    this.setColour(260);
+    this.setColour(0);
     this.setTooltip('');
     this.setHelpUrl('http://www.example.com/');
   }
@@ -28,7 +28,7 @@ Blockly.Blocks['listen_bool'] = {
         .setCheck("String")
         .appendField("you say");
     this.setOutput(true, null);
-    this.setColour(260);
+    this.setColour(0);
     this.setTooltip('');
     this.setHelpUrl('http://www.example.com/');
   }
@@ -47,7 +47,7 @@ Blockly.Blocks['listen_text'] = {
     this.appendDummyInput()
         .appendField("what you say");
     this.setOutput(true, "String");
-    this.setColour(260);
+    this.setColour(0);
     this.setTooltip('');
     this.setHelpUrl('http://www.example.com/');
   }
@@ -67,7 +67,7 @@ Blockly.Blocks['display_img'] = {
         .appendField(new Blockly.FieldTextInput("this link"), "IMG_SRC");
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
-    this.setColour(330);
+    this.setColour(60);
     this.setTooltip('');
     this.setHelpUrl('http://www.example.com/');
   }
@@ -87,7 +87,7 @@ Blockly.Blocks['display_pause'] = {
         .appendField("Pause for");
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
-    this.setColour(330);
+    this.setColour(60);
     this.setTooltip('');
     this.setHelpUrl('http://www.example.com/');
   }
@@ -108,7 +108,7 @@ Blockly.Blocks['speech_speak'] = {
         .appendField("Say");
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
-    this.setColour(230);
+    this.setColour(300);
     this.setTooltip('');
     this.setHelpUrl('http://www.example.com/');
   }
@@ -134,7 +134,7 @@ Blockly.Blocks['display_text'] = {
         .appendField("Write");
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
-    this.setColour(260);
+    this.setColour(60);
     this.setTooltip('');
     this.setHelpUrl('http://www.example.com/');
   }
