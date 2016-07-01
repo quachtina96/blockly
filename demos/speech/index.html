@@ -92,7 +92,7 @@
   <aside>
        <p id="displayText"> Your story's text will be shown here.</p>
 
-       <img id = "displayPic" src = "http://cdn3-www.cattime.com/assets/uploads/2011/08/best-kitten-names-1.jpg" alt="Image chosen by user" style = "width:40%;height:40%;">
+       <img id = "displayPic" src = "http://cdn3-www.cattime.com/assets/uploads/2011/08/best-kitten-names-1.jpg" alt="Image chosen by user" style = "width:35%;height:35%;">
   </aside>
 
 
@@ -433,16 +433,77 @@
     <sep></sep>
     <category name="Variables" colour="330" custom="VARIABLE"></category>
     <category name="Functions" colour="290" custom="PROCEDURE"></category>
-
-  
   </xml>
+
+  <xml id="monkeyDemo" style="display: none">
+    <block type="display_text" id="3SPHvhL1yDvZe+!L(6`D" x="138" y="38">
+      <value name="DISPLAY_TEXT">
+        <shadow type="text" id="Cvvm5LB+fy78XXet3pas">
+          <field name="TEXT">George is a hungry monkey. Will you give George a banana?</field>
+        </shadow>
+      </value>
+      <next>
+        <block type="display_img" id="3SPHvhL1yDvZe+!L(6`D" x="138" y="38">
+        <field name="IMG_SRC">https://pixabay.com/static/uploads/photo/2014/10/04/16/31/monkey-473687_960_720.jpg</field>
+        <next>
+            <block type="controls_if" id="m1,)YT65J-nl+,|01PVp">
+              <mutation else="1"></mutation>
+              <value name="IF0">
+                <block type="listen_bool" id="|]U?w3s{,pa9c-[m?~Xv">
+                  <value name="WORD" id="6">
+                    <shadow type="text" id="7">
+                      <field name="TEXT">yes</field>
+                    </shadow>
+                  </value>
+                </block>
+              </value>
+              <statement name="DO0">
+                <block type="display_text" id="BZKgly:49)z{9dtsD9fi">
+                  <value name="DISPLAY_TEXT">
+                    <shadow type="text" id="e(fM@Dr%aI*hk3A2V9NQ">
+                      <field name="TEXT">George is a happy monkey!</field>
+                    </shadow>
+                  </value>
+                  <next>
+                    <block type="display_img" id="1">
+                      <field name="IMG_SRC">https://c2.staticflickr.com/4/3932/15278523118_d21b9978f0_b.jpg</field>
+                    </block>
+                  </next>
+                </block>
+              </statement>
+              <statement name="ELSE">
+                <block type="display_text" id="3">
+                  <value name="DISPLAY_TEXT">
+                    <shadow type="text" id="4">
+                      <field name="TEXT">George is a sad monkey!</field>
+                    </shadow>
+                  </value>
+                  <next>
+                    <block type="display_img" id="5">
+                      <field name="IMG_SRC">https://pixabay.com/static/uploads/photo/2015/10/09/06/46/chimpanzee-978809_960_720.jpg</field>
+                    </block>
+                  </next>
+                </block>
+              </statement>
+            </block>
+          </next>
+        </block>
+      </next>
+    </block>
+  </xml>
+
   </section>
 
   <script>
   var workspace = Blockly.inject('blocklyDiv',  
         {media: '../../media/',
          toolbox: document.getElementById('toolbox')});
-         </script>
+
+  Blockly.Xml.domToWorkspace(document.getElementById('monkeyDemo'),
+                               workspace);
+
+  </script>
+
 
 </body>
 </html>
