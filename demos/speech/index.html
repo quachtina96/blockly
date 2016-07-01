@@ -105,6 +105,8 @@
     <category name="Speak">
       <block type="speech_speak"></block>
       <block type="speech_set_voice"></block>
+      <block type="speech_set_volume"></block>
+      <block type="speech_set_rate"></block>
   </xml>
   </section>
 
@@ -224,7 +226,6 @@
           textAreaID = textAreaID ? textAreaID.toString() : '';
           var textArea;
           myInterpreter.createPrimitive(textArea = document.getElementById(textAreaID));
-          console.log(textArea);
           while (textArea.hasChildNodes()) {
             myInterpreter.createPrimitive(textArea.removeChild(textArea.lastChild));
           };
@@ -275,7 +276,19 @@
           return myInterpreter.createPrimitive(msg.voice = voices[newVoiceIndex]);
         };
         myInterpreter.setProperty(scope, 'setVoice',
-            myInterpreter.createNativeFunction(wrapper));        
+            myInterpreter.createNativeFunction(wrapper));
+
+        var wrapper = function setVolume(newVolume) {
+          return myInterpreter.createPrimitive(msg.volume = newVolume);
+        };   
+        myInterpreter.setProperty(scope, 'setVolume',
+            myInterpreter.createNativeFunction(wrapper));    
+
+        var wrapper = function setRate(newRate) {
+          return myInterpreter.createPrimitive(msg.rate = newRate);
+        };   
+        myInterpreter.setProperty(scope, 'setRate',
+            myInterpreter.createNativeFunction(wrapper));    
         
       };
       //initializes myInterpreter

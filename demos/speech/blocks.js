@@ -184,15 +184,12 @@ var getVoicesForBlock = function(voices){
     var voice = [voices[i].name, i.toString()];
     dropdown.push(voice);
   };
-  console.log(dropdown);
   return dropdown;
 }
 
 var voices;
 window.speechSynthesis.onvoiceschanged = function(){
     voices = window.speechSynthesis.getVoices();
-    console.log(voices);
-    console.log(getVoicesForBlock(voices));
     Blockly.Blocks['speech_set_voice'] = {
       init: function() {
         this.appendDummyInput()
@@ -212,18 +209,50 @@ Blockly.JavaScript['speech_set_voice'] = function(block) {
   // var newVoice = voices[parseInt(dropdown_name)];
   var voiceIndex = parseInt(dropdown_name);
   var code = 'voices = getVoices();\n\
-              var voiceIndex = ' + voiceIndex + ';\n\
-              var newVoice = voices[voiceIndex];\n\
-              setVoice(voiceIndex);';
+    var voiceIndex = ' + voiceIndex + ';\n\
+    var newVoice = voices[voiceIndex];\n\
+    setVoice(voiceIndex);';
   return code;
 };
 
-// msg.voice = voices.filter(function(voice) { return voice.name == 'Alex'; })[0]
+Blockly.Blocks['speech_set_volume'] = {
+  init: function() {
+    this.appendValueInput("VOLUME")
+        .setCheck("Number")
+        .appendField("Set volume to (between 0 and 1)");
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(210);
+    this.setTooltip('');
+    this.setHelpUrl('http://www.example.com/');
+  }
+};
 
-// msg.voice = voices[10]; // Note: some voices don't support altering params
-// msg.voiceURI = 'native';
-// msg.volume = 1; // 0 to 1
-// msg.rate = 1; // 0.1 to 10
-// msg.pitch = 2; //0 to 2
-// msg.text = 'Hello World';
-// msg.lang = 'en-US';
+Blockly.JavaScript['speech_set_volume'] = function(block) {
+  var value_volume = Blockly.JavaScript.valueToCode(block, 'VOLUME', Blockly.JavaScript.ORDER_ATOMIC);
+  var code = '';
+  if (value_volume >= 0 && value_volume <= 1)
+    code = 'setVolume('+ value_volume+');\n';
+  return code;
+};
+
+Blockly.Blocks['speech_set_rate'] = {
+  init: function() {
+    this.appendValueInput("RATE")
+        .setCheck("Number")
+        .appendField("Set speech rate to (between .1 and 10)");
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(210);
+    this.setTooltip('');
+    this.setHelpUrl('http://www.example.com/');
+  }
+};
+
+Blockly.JavaScript['speech_set_rate'] = function(block) {
+  var value_rate = Blockly.JavaScript.valueToCode(block, 'RATE', Blockly.JavaScript.ORDER_ATOMIC);
+  var code = '';
+  if (value_rate >= .1 && value_rate <= 10)
+    code = 'setRate('+ value_rate+');\n';
+  return code;
+};
