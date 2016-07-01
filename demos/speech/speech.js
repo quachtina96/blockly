@@ -51,86 +51,86 @@ var runCode = function() {
 
     // WRAPPERS FOR SPEECH RECOGNITION
         //listen_branch, used for listen_if and listen_bool
-        var listenBranchWrapper = function(word,callback) {
-          word = word ? word.toString() : '';
-          var localRecognizer = new SpeechRecognition();
-          updateGrammars(localRecognizer);
-          localRecognizer.start();
-          logMessage(myInterpreter,"Listening...");
-          localRecognizer.onresult = function() {
-            var speechResult = formatText(event.results[0][0].transcript);
-            logMessage(myInterpreter, 'You said: \"' + speechResult + '\"\n');
-            callback(myInterpreter.createPrimitive(new String(speechResult).valueOf() == new String(word).valueOf()));
-          };
-          localRecognizer.onnomatch = function() {
-            logMessage(myInterpreter,"Done listening. Didn't hear anything.");
-            callback(myInterpreter.createPrimitive(false));
-          };
-          localRecognizer.onerror = function() {
-            logMessage(myInterpreter,"Done listening. Error.");
-            callback(myInterpreter.createPrimitive(false));
+    var listenBranchWrapper = function(word,callback) {
+        word = word ? word.toString() : '';
+        var localRecognizer = new SpeechRecognition();
+        updateGrammars(localRecognizer);
+        localRecognizer.start();
+        logMessage(myInterpreter,"Listening...");
+        localRecognizer.onresult = function() {
+          var speechResult = formatText(event.results[0][0].transcript);
+          logMessage(myInterpreter, 'You said: \"' + speechResult + '\"\n');
+          callback(myInterpreter.createPrimitive(new String(speechResult).valueOf() == new String(word).valueOf()));
         };
+        localRecognizer.onnomatch = function() {
+          logMessage(myInterpreter,"Done listening. Didn't hear anything.");
+          callback(myInterpreter.createPrimitive(false));
+        };
+        localRecognizer.onerror = function() {
+          logMessage(myInterpreter,"Done listening. Error.");
+          callback(myInterpreter.createPrimitive(false));
       };
-      myInterpreter.setProperty(scope,'listen_branch', myInterpreter.createAsyncFunction(listenBranchWrapper));
+    };
+  myInterpreter.setProperty(scope,'listen_branch', myInterpreter.createAsyncFunction(listenBranchWrapper));
 
-        //listen_text
-        var listenTextWrapper = function(callback) {
-          var localRecognizer = new SpeechRecognition();
-          updateGrammars(localRecognizer);
-          localRecognizer.start();
-          logMessage(myInterpreter,"Listening...");
-          localRecognizer.onresult = function() {
-              var speechResult = event.results[0][0].transcript;
-              logMessage(myInterpreter, 'You said: \"' + speechResult + '\"');
-              callback(myInterpreter.createPrimitive(speechResult));
-          };
-        };
-        myInterpreter.setProperty(scope,'listen_text', myInterpreter.createAsyncFunction(listenTextWrapper));
+    //listen_text
+    var listenTextWrapper = function(callback) {
+      var localRecognizer = new SpeechRecognition();
+      updateGrammars(localRecognizer);
+      localRecognizer.start();
+      logMessage(myInterpreter,"Listening...");
+      localRecognizer.onresult = function() {
+          var speechResult = event.results[0][0].transcript;
+          logMessage(myInterpreter, 'You said: \"' + speechResult + '\"');
+          callback(myInterpreter.createPrimitive(speechResult));
+      };
+    };
+    myInterpreter.setProperty(scope,'listen_text', myInterpreter.createAsyncFunction(listenTextWrapper));
 
-        //display_img
-        var imageWrapper = function(url) {
-          url = url ? url.toString() : '';
-          return myInterpreter.createPrimitive(window.document.getElementById('displayPic').src = url);
-        };
-        myInterpreter.setProperty(scope, 'displayImage',
-            myInterpreter.createNativeFunction(imageWrapper));
+    //display_img
+    var imageWrapper = function(url) {
+      url = url ? url.toString() : '';
+      return myInterpreter.createPrimitive(window.document.getElementById('displayPic').src = url);
+    };
+    myInterpreter.setProperty(scope, 'displayImage',
+        myInterpreter.createNativeFunction(imageWrapper));
 
-        //pause
-        var pauseWrapper = function(time,callback) {
-          time = time ? time.toString() : '';
-          timeVar = parseInt(time);
-          window.console.log(timeVar);  
-          var resume = function() {
-            callback();
-          };
-          return myInterpreter.createPrimitive(window.setTimeout(resume,timeVar));
-        };
-        myInterpreter.setProperty(scope, 'pause',
-            myInterpreter.createAsyncFunction(pauseWrapper));
+    //pause
+    var pauseWrapper = function(time,callback) {
+      time = time ? time.toString() : '';
+      timeVar = parseInt(time);
+      window.console.log(timeVar);  
+      var resume = function() {
+        callback();
+      };
+      return myInterpreter.createPrimitive(window.setTimeout(resume,timeVar));
+    };
+    myInterpreter.setProperty(scope, 'pause',
+        myInterpreter.createAsyncFunction(pauseWrapper));
 
-        //speech
-        var speechWrapper = function(wordsToSay,callback){
-          wordsToSay = wordsToSay ? wordsToSay.toString() : '';
-          if ('speechSynthesis' in window) {
-            localMsg = new SpeechSynthesisUtterance(wordsToSay);
-            window.speechSynthesis.speak(localMsg);
-          // Synthesis support. Make your web apps talk!
-          } else {
-            logMessage(myInterpreter,"speechSynthesis not found. Text to speech capability under Web Speech API not supported.")
-          }
-          localMsg.onend = function(e) {
-            callback();
-          };
-        };
-        myInterpreter.setProperty(scope, 'say', myInterpreter.createAsyncFunction(speechWrapper));
+    //speech
+    var speechWrapper = function(wordsToSay,callback){
+      wordsToSay = wordsToSay ? wordsToSay.toString() : '';
+      if ('speechSynthesis' in window) {
+        localMsg = new SpeechSynthesisUtterance(wordsToSay);
+        window.speechSynthesis.speak(localMsg);
+      // Synthesis support. Make your web apps talk!
+      } else {
+        logMessage(myInterpreter,"speechSynthesis not found. Text to speech capability under Web Speech API not supported.")
+      }
+      localMsg.onend = function(e) {
+        callback();
+      };
+    };
+    myInterpreter.setProperty(scope, 'say', myInterpreter.createAsyncFunction(speechWrapper));
 
-        //display text
-        var textWrapper = function(text) {
-          text = text ? text.toString() : '';
-          return myInterpreter.createPrimitive(document.getElementById('displayText').textContent = text);
-        };
-        myInterpreter.setProperty(scope, 'updateTextDisplay',
-            myInterpreter.createNativeFunction(textWrapper));
+    //display text
+    var textWrapper = function(text) {
+      text = text ? text.toString() : '';
+      return myInterpreter.createPrimitive(document.getElementById('displayText').textContent = text);
+    };
+    myInterpreter.setProperty(scope, 'updateTextDisplay',
+        myInterpreter.createNativeFunction(textWrapper));
 
     //listen_text
     var listenTextWrapper = function(callback) {
