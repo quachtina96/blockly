@@ -18,7 +18,7 @@ Blockly.JavaScript['listen_if'] = function(block) {
     var text_word = Blockly.JavaScript.valueToCode(block, 'WORD', Blockly.JavaScript.ORDER_ATOMIC);
     var statements_do = Blockly.JavaScript.statementToCode(block, 'DO');
     addRecognizableWord(text_word);
-    return 'if (listen_branch('+text_word+')) {\n' + statements_do + '}\n';
+    return 'if (listen_branch('+formatText(text_word)+')) {\n' + statements_do + '}\n';
 };
 
 //listen_bool returns a boolean value, true if the user says a specified word and false otherwise
@@ -37,7 +37,8 @@ Blockly.Blocks['listen_bool'] = {
 Blockly.JavaScript['listen_bool'] = function(block) {
     var text_word = Blockly.JavaScript.valueToCode(block, 'WORD', Blockly.JavaScript.ORDER_ATOMIC);
     addRecognizableWord(text_word);
-    var code = 'listen_branch('+text_word+')';
+    window.console.log(text_word + " "+ formatText(text_word));
+    var code = 'listen_branch('+formatText(text_word)+')';
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
@@ -85,6 +86,8 @@ Blockly.Blocks['display_pause'] = {
     this.appendValueInput("TIME")
         .setCheck("Number")
         .appendField("Pause for");
+    this.appendDummyInput()
+        .appendField("milliseconds");
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour(60);
@@ -120,10 +123,10 @@ Blockly.Blocks['display_update_text'] = {
 Blockly.JavaScript['display_update_text'] = function(block) {
   var value_update_text = Blockly.JavaScript.valueToCode(block, 'UPDATE_TEXT', Blockly.JavaScript.ORDER_ATOMIC);
   var dropdown_name = block.getFieldValue('WRITETYPE');
-  var code = 'if( ' + Blockly.JavaScript.quote_(dropdown_name) + ' == "REPLACE"){\
-      clearText("textArea");\
-      }\
-      appendText("p", '+ value_update_text + ',"textArea");\n';
+  var code = 'if(' + Blockly.JavaScript.quote_(dropdown_name) + ' == "REPLACE"){\n\
+      clearText("textArea");\n\
+}\n\
+appendText("p", '+ value_update_text + ',"textArea");\n';
   return code;
 };
 

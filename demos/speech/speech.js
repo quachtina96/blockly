@@ -19,8 +19,8 @@ var msg = new SpeechSynthesisUtterance();
  */
 var showCode = function() {   
   Blockly.JavaScript.INFINITE_LOOP_TRAP = null;
-  var code = "Your code: \n" + Blockly.JavaScript.workspaceToCode(workspace);
-  document.getElementById('logText').textContent = code;
+  var code = "<pre>" + Blockly.JavaScript.workspaceToCode(workspace) + "</pre>";
+  //document.getElementById('logText').innerHTML = code;
   alert(code);
 };
 
@@ -50,32 +50,6 @@ var runCode = function() {
         myInterpreter.createNativeFunction(alertWrapper));
 
     // WRAPPERS FOR SPEECH RECOGNITION
-
-<<<<<<< HEAD
-    /**
-     * Generate JavaScript code and run it using the JS Interpreter, prints code to console for debugging. Defines 
-     * wrappers (syncronously and asyncronously) to handle certain blocks
-     * TODO(edauterman): Is there a way to decompose initFunc better while not creating any scoping problems? 
-     * TODO(edauterman): Remove names after function and give them unique names. 
-     * NOTE: If move the wrapper functions outside of runCode, then myInterpreter is not in scope (needs to be a 
-     * local because it needs to be recreated each time to allow for changes to code), and myInterpreter can't be
-     * passed as an argument because the order and type of arguments is defined by JS Interpreter.
-     */
-    var runCode = function() {
-      var code = Blockly.JavaScript.workspaceToCode(workspace);
-      window.console.log(code);
-
-      //used to define wrappers for myInterpreter
-      var initFunc = function(myInterpreter,scope) {
-
-        //alert
-        var alertWrapper = function(text) {
-          text = text ? text.toString() : '';
-          return myInterpreter.createPrimitive(alert(text));
-        };
-        myInterpreter.setProperty(scope, 'alert',
-            myInterpreter.createNativeFunction(alertWrapper));
-
         //listen_branch, used for listen_if and listen_bool
         var listenBranchWrapper = function(word,callback) {
           word = word ? word.toString() : '';
@@ -84,13 +58,20 @@ var runCode = function() {
           localRecognizer.start();
           logMessage(myInterpreter,"Listening...");
           localRecognizer.onresult = function() {
-              var speechResult = event.results[0][0].transcript;
-              var boolMessage = new String(speechResult).valueOf() == new String(word).valueOf() ? "equals" : "not equals";
-              logMessage(myInterpreter, 'You said: \"' + speechResult + '\"\n' + boolMessage);
-              callback(myInterpreter.createPrimitive(new String(speechResult).valueOf() == new String(word).valueOf()));
+            var speechResult = formatText(event.results[0][0].transcript);
+            logMessage(myInterpreter, 'You said: \"' + speechResult + '\"\n');
+            callback(myInterpreter.createPrimitive(new String(speechResult).valueOf() == new String(word).valueOf()));
           };
+          localRecognizer.onnomatch = function() {
+            logMessage(myInterpreter,"Done listening. Didn't hear anything.");
+            callback(myInterpreter.createPrimitive(false));
+          };
+          localRecognizer.onerror = function() {
+            logMessage(myInterpreter,"Done listening. Error.");
+            callback(myInterpreter.createPrimitive(false));
         };
-        myInterpreter.setProperty(scope,'listen_branch', myInterpreter.createAsyncFunction(listenBranchWrapper));
+      };
+      myInterpreter.setProperty(scope,'listen_branch', myInterpreter.createAsyncFunction(listenBranchWrapper));
 
         //listen_text
         var listenTextWrapper = function(callback) {
@@ -162,6 +143,14 @@ var runCode = function() {
           logMessage(myInterpreter, 'You said: \"' + speechResult + '\"');
           callback(myInterpreter.createPrimitive(speechResult));
       };
+      localRecognizer.onnomatch = function() {
+          logMessage(myInterpreter,"Done listening. No match found.");
+          callback(myInterpreter.createPrimitive(false));
+      };
+      localRecognizer.onerror = function() {
+          logMessage(myInterpreter,"Done listening. Error.");
+          callback(myInterpreter.createPrimitive(false));
+      };
     };
     myInterpreter.setProperty(scope,'listen_text', myInterpreter.createAsyncFunction(listenTextWrapper));
 
@@ -178,7 +167,7 @@ var runCode = function() {
     //pause
     var pauseWrapper = function(time,callback) {
       time = time ? time.toString() : '';
-      timeVar = parseInt(time);
+      var timeVar = parseInt(time);
       window.console.log(timeVar);  
       var resume = function() {
         callback();
@@ -303,7 +292,7 @@ var runButton = function(myInterpreter) {
  * @param {string} message The message that will be printed to the logging area and console
  */
 var logMessage = function(myInterpreter, message) {
-  myInterpreter.createPrimitive(document.getElementById('logText').textContent = message);
+  myInterpreter.createPrimitive(document.getElementById('logText').innerHTML = '<code>'+message+'</code>');
   window.console.log(message);
 };
 
@@ -351,3 +340,14 @@ var updateGrammars = function(myRecognizer) {
   myRecognizer.interimResults = false;
   myRecognizer.maxAlternatives = 1;
 };
+
+//Given a String, gets rid of punctuation and capitalization--all words are left lowercase and separated by a single space
+  var formatText = function (text){
+    // if(text !== undefined){
+      var punctuationless = text.replace(/[.,\/#!$%\^&\*;:{}—=\-_`~()]/g," "); //remove punctuation
+
+      var finalString = punctuationless.replace(/\s\s+/g, ' '); //replace all spaces with a single space
+      var finalString = finalString.toLowerCase().trim(); //make all lowercase and get rid of extra surrounding white space
+    // }
+    return finalString; 
+  };
