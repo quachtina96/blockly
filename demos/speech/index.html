@@ -81,16 +81,19 @@
       <a href="../index.html">Demos</a> &gt; Adventure Blockly</h1>
 
       <p>Make your own adventure through text, speech, and pictures. Create your own or check out some of our examples (link).</p>
-
       <p id = "logText">This is where logging messages go.</p>
-
       <p>
         <button onclick="showCode()">Show JavaScript</button>   
         <button onclick="runCode()">Start Adventure</button>
       </p>
 
   <aside>
-       <p id="displayText"> Your story's text will be shown here.</p>
+      <div id="textArea">
+        <p id="displayText"> Your story's text will be shown here.</p>
+        <p id="displayText"> Your story's text will be shown here.</p>
+        <p id="displayText"> Your story's text will be shown here.</p>
+        <p id="displayText"> Your story's text will be shown here.</p>
+      </div>
 
        <img id = "displayPic" src = "http://cdn3-www.cattime.com/assets/uploads/2011/08/best-kitten-names-1.jpg" alt="Image chosen by user" style = "width:35%;height:35%;">
   </aside>
@@ -115,8 +118,9 @@
     </category>
     <category name="Display" colour="60">
       <block type="display_img"></block>
-      <block type="display_text">
-       <value name="DISPLAY_TEXT">
+      <block type="display_clear_text"></block>
+      <block type="display_update_text">
+       <value name="UPDATE_TEXT">
           <shadow type="text"></shadow>
         </value>
       </block>
@@ -128,11 +132,29 @@
         </value>
       </block>
     </category>
-    <category name="Speak" colour="300">
-      <block type="speech_speak"></block>
+    <category name="Speak" colour="30">
+      <block type="speech_speak">
+        <value name="TO_SAY">
+          <shadow type="text"></shadow>
+        </value>
+      </block>
+      <block type="speech_set_voice"></block>
+      <block type="speech_set_volume">
+        <value name="VOLUME">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="speech_set_rate">
+        <value name="RATE">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+      </block>
     </category>
-
-      <category name="Logic" colour="210">
+    <category name="Logic" colour="210">
       <block type="controls_if"></block>
       <block type="logic_compare"></block>
       <block type="logic_operation"></block>
@@ -435,6 +457,7 @@
     <category name="Functions" colour="290" custom="PROCEDURE"></category>
   </xml>
 
+<<<<<<< HEAD
   <xml id="monkeyDemo" style="display: none">
     <block type="display_text" id="3SPHvhL1yDvZe+!L(6`D" x="138" y="38">
       <value name="DISPLAY_TEXT">
@@ -490,6 +513,8 @@
         </block>
       </next>
     </block>
+=======
+>>>>>>> 5c2bd3097218ca236c8a23316b34d26c57544d60
   </xml>
 
   </section>
@@ -498,10 +523,13 @@
   var workspace = Blockly.inject('blocklyDiv',  
         {media: '../../media/',
          toolbox: document.getElementById('toolbox')});
+<<<<<<< HEAD
 
   Blockly.Xml.domToWorkspace(document.getElementById('monkeyDemo'),
                                workspace);
 
+=======
+>>>>>>> 5c2bd3097218ca236c8a23316b34d26c57544d60
   </script>
 
 
