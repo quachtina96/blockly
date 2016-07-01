@@ -56,8 +56,9 @@
           logMessage(myInterpreter,"Listening...");
           localRecognizer.onresult = function() {
               var speechResult = event.results[0][0].transcript;
-              logMessage(myInterpreter, 'You said: \"' + speechResult + '\"');
-              callback(myInterpreter.createPrimitive(speechResult == word));
+              var boolMessage = new String(speechResult).valueOf() == new String(word).valueOf() ? "equals" : "not equals";
+              logMessage(myInterpreter, 'You said: \"' + speechResult + '\"\n' + boolMessage);
+              callback(myInterpreter.createPrimitive(new String(speechResult).valueOf() == new String(word).valueOf()));
           };
         };
         myInterpreter.setProperty(scope,'listen_branch', myInterpreter.createAsyncFunction(listenBranchWrapper));
