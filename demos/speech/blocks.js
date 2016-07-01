@@ -118,7 +118,7 @@ Blockly.JavaScript['speech_speak'] = function(block) {
   var value_to_say = Blockly.JavaScript.valueToCode(block, 'TO_SAY', Blockly.JavaScript.ORDER_ATOMIC);
   var code;
   if (value_to_say !== '' && value_to_say !== null){
-    code = 'say(' + value_to_say + ');\n';
+    code = 'globalSay(' + value_to_say + ');\n';
   }  
   else{
     code = '\n';
@@ -168,7 +168,62 @@ Blockly.Blocks['display_clear_text'] = {
 };
 
 Blockly.JavaScript['display_clear_text'] = function(block) {
-  // TODO: Assemble JavaScript into code variable.
   var code = 'clearText("textArea");\n';
   return code;
 };
+
+//helper function for the 'speech_set_voice' block
+//@param none
+//@return formatted array of tuple arrays to supply as the dropdown options 
+//depends on the global voices array located in index.html
+
+
+var getVoicesForBlock = function(voices){
+  var dropdown = [];
+  for (i = 0; i < voices.length; i++){
+    var voice = [voices[i].name, i.toString()];
+    dropdown.push(voice);
+  };
+  console.log(dropdown);
+  return dropdown;
+}
+
+var voices;
+window.speechSynthesis.onvoiceschanged = function(){
+    voices = window.speechSynthesis.getVoices();
+    console.log(voices);
+    console.log(getVoicesForBlock(voices));
+    Blockly.Blocks['speech_set_voice'] = {
+      init: function() {
+        this.appendDummyInput()
+            .appendField("Set voice to")
+            .appendField(new Blockly.FieldDropdown(getVoicesForBlock(voices)), "VOICES");
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour(260);
+        this.setTooltip('');
+        this.setHelpUrl('http://www.example.com/');
+      }
+    };
+};
+
+Blockly.JavaScript['speech_set_voice'] = function(block) {
+  var dropdown_name = block.getFieldValue('VOICES');
+  // var newVoice = voices[parseInt(dropdown_name)];
+  var voiceIndex = parseInt(dropdown_name);
+  var code = 'voices = getVoices();\n\
+              var voiceIndex = ' + voiceIndex + ';\n\
+              var newVoice = voices[voiceIndex];\n\
+              setVoice(voiceIndex);';
+  return code;
+};
+
+// msg.voice = voices.filter(function(voice) { return voice.name == 'Alex'; })[0]
+
+// msg.voice = voices[10]; // Note: some voices don't support altering params
+// msg.voiceURI = 'native';
+// msg.volume = 1; // 0 to 1
+// msg.rate = 1; // 0.1 to 10
+// msg.pitch = 2; //0 to 2
+// msg.text = 'Hello World';
+// msg.lang = 'en-US';

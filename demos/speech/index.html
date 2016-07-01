@@ -86,7 +86,8 @@
     </category>
     <category name="Display">
       <block type="display_img"></block>
-      <block type="display_text"></block>
+      <block type="display_update_text"></block>
+      <block type="display_clear_text"></block>
       <block type="display_pause"></block>
     </category>
     <category name="Usual">
@@ -103,8 +104,7 @@
     </category>
     <category name="Speak">
       <block type="speech_speak"></block>
-      <block type="display_update_text"></block>
-      <block type="display_clear_text"></block>
+      <block type="speech_set_voice"></block>
   </xml>
   </section>
 
@@ -120,6 +120,8 @@
     var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
     var SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList;
     var SpeechRecognitionEvent = SpeechRecognitionEvent ||webkitSpeechRecognitionEvent;
+    var msg = new SpeechSynthesisUtterance();
+    //var voices;
 
     //associated with the "Show Javascript button", outputs the code in an alert window
     //TODO(edauterman): Figure out how to format the code correctly in the HTML (with line breaks)
@@ -217,8 +219,7 @@
         };
         myInterpreter.setProperty(scope, 'say', myInterpreter.createAsyncFunction(wrapper));
 
-
-        //wrapper function for clearing the textArea div
+        //clear the textArea div
         var wrapper = function clearText(textAreaID){
           textAreaID = textAreaID ? textAreaID.toString() : '';
           var textArea;
@@ -231,7 +232,7 @@
         };
         myInterpreter.setProperty(scope, 'clearText', myInterpreter.createNativeFunction(wrapper));
 
-        //wrapper to appendText to the given div within JSInterpreter
+        //appendText to the given div within JSInterpreter
         var wrapper = function appendText(elementType, text, textAreaID){
           text = text ? text.toString() : '';
           elementType = elementType ? elementType.toString() : '';
@@ -248,6 +249,34 @@
           return myInterpreter.createPrimitive(textArea);   // Append <li> to <ul> with id="myList"
         }
         myInterpreter.setProperty(scope, 'appendText', myInterpreter.createNativeFunction(wrapper));
+
+        var wrapper = function globalSay(wordsToSay, callback){
+          wordsToSay = wordsToSay ? wordsToSay.toString() : '';
+          if ('speechSynthesis' in window) {
+            msg.text = wordsToSay;
+            window.speechSynthesis.speak(msg);
+          // Synthesis support. Make your web apps talk!
+          } else {
+            console.log("speechSynthesis not found. Text to speech capability under Web Speech API not supported.")
+          }
+          msg.onend = function(e) {
+            callback();
+          };
+        };
+        myInterpreter.setProperty(scope, 'globalSay', myInterpreter.createAsyncFunction(wrapper)); 
+        
+        var wrapper = function getVoices() {
+          return myInterpreter.createPrimitive(window.speechSynthesis.getVoices());
+        };
+        myInterpreter.setProperty(scope, 'getVoices',
+            myInterpreter.createNativeFunction(wrapper));
+
+        var wrapper = function setVoice(newVoiceIndex) {
+          return myInterpreter.createPrimitive(msg.voice = voices[newVoiceIndex]);
+        };
+        myInterpreter.setProperty(scope, 'setVoice',
+            myInterpreter.createNativeFunction(wrapper));        
+        
       };
       //initializes myInterpreter
       var myInterpreter = new Interpreter(code,initFunc);
