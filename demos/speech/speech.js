@@ -50,6 +50,7 @@ var runCode = function() {
         myInterpreter.createNativeFunction(alertWrapper));
 
     // WRAPPERS FOR SPEECH RECOGNITION
+<<<<<<< HEAD
         //listen_branch, used for listen_if and listen_bool
     var listenBranchWrapper = function(word,callback) {
         word = word ? word.toString() : '';
