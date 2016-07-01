@@ -119,7 +119,7 @@ var runCode = function() {
       return myInterpreter.createPrimitive(textArea);
     };
     //denotes to the interpreter that upon calls to clearText, it should execute the wrapper function defined. 
-    myInterpreter.setProperty(scope, 'clearText', myInterpreter.createNativeFunction(wrapper));
+    myInterpreter.setProperty(scope, 'clearText', myInterpreter.createNativeFunction(clearTextWrapper));
 
     /** appendText to the given div within JSInterpreter
      * @param {String, String, String} 
@@ -140,7 +140,7 @@ var runCode = function() {
       myInterpreter.createPrimitive(document.getElementById(textAreaID).appendChild(node)); 
       return myInterpreter.createPrimitive(textArea);   // Append <li> to <ul> with id="myList"
     }
-    myInterpreter.setProperty(scope, 'appendText', myInterpreter.createNativeFunction(wrapper));
+    myInterpreter.setProperty(scope, 'appendText', myInterpreter.createNativeFunction(appendTextWrapper));
 
     //WRAPPERS FOR SPEECH SYNTHESIS
 
@@ -159,14 +159,14 @@ var runCode = function() {
         callback();
       };
     };
-    myInterpreter.setProperty(scope, 'globalSay', myInterpreter.createAsyncFunction(wrapper)); 
+    myInterpreter.setProperty(scope, 'globalSay', myInterpreter.createAsyncFunction(speechWrapper)); 
     
     //gets voices from the window
     var getVoicesWrapper = function() {
       return myInterpreter.createPrimitive(window.speechSynthesis.getVoices());
     };
     myInterpreter.setProperty(scope, 'getVoices',
-        myInterpreter.createNativeFunction(wrapper));
+        myInterpreter.createNativeFunction(getVoicesWrapper));
 
     /** set voices
      * @param {number} assumes an integer
@@ -175,7 +175,7 @@ var runCode = function() {
       return myInterpreter.createPrimitive(msg.voice = voices[newVoiceIndex]);
     };
     myInterpreter.setProperty(scope, 'setVoice',
-        myInterpreter.createNativeFunction(wrapper));
+        myInterpreter.createNativeFunction(setVoiceWrapper));
 
     /** set volume
      * @param {number} assumes an number between 0 and 1
@@ -184,7 +184,7 @@ var runCode = function() {
       return myInterpreter.createPrimitive(msg.volume = newVolume);
     };   
     myInterpreter.setProperty(scope, 'setVolume',
-        myInterpreter.createNativeFunction(wrapper));    
+        myInterpreter.createNativeFunction(setVolumeWrapper));    
 
     /** set rate
      * @param {number} assumes an number between .1 and 10
@@ -193,7 +193,7 @@ var runCode = function() {
       return myInterpreter.createPrimitive(msg.rate = newRate);
     };   
     myInterpreter.setProperty(scope, 'setRate',
-        myInterpreter.createNativeFunction(wrapper));    
+        myInterpreter.createNativeFunction(setRateWrapper));    
   };
   //initializes myInterpreter
   var myInterpreter = new Interpreter(code,initFunc);
