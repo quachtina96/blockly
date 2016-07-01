@@ -132,11 +132,27 @@
         </value>
       </block>
     </category>
-    <category name="Speak">
-      <block type="speech_speak"></block>
+    <category name="Speak" colour="30">
+      <block type="speech_speak">
+        <value name="TO_SAY">
+          <shadow type="text"></shadow>
+        </value>
+      </block>
       <block type="speech_set_voice"></block>
-      <block type="speech_set_volume"></block>
-      <block type="speech_set_rate"></block>
+      <block type="speech_set_volume">
+        <value name="VOLUME">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="speech_set_rate">
+        <value name="RATE">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+      </block>
     </category>
     <category name="Logic" colour="210">
       <block type="controls_if"></block>

@@ -99,33 +99,6 @@ Blockly.JavaScript['display_pause'] = function(block) {
   return code;
 };
 
-//speech_speak block links to a String input and says the String aloud upon execution
-Blockly.Blocks['speech_speak'] = {
-  init: function() {
-    this.appendValueInput("TO_SAY")
-        .setCheck("String")
-        .appendField("Say");
-    this.setPreviousStatement(true, null);
-    this.setNextStatement(true, null);
-    this.setColour(300);
-    this.setTooltip('');
-    this.setHelpUrl('http://www.example.com/');
-  }
-};
-
-Blockly.JavaScript['speech_speak'] = function(block) {
-  var value_to_say = Blockly.JavaScript.valueToCode(block, 'TO_SAY', Blockly.JavaScript.ORDER_ATOMIC);
-  var code;
-  if (value_to_say !== '' && value_to_say !== null){
-    code = 'globalSay(' + value_to_say + ');\n';
-  }  
-  else{
-    code = '\n';
-  }
-  return code;
-};
-
-
 //updates the textArea div by either replacing or appending to current text.
 Blockly.Blocks['display_update_text'] = {
   init: function() {
@@ -137,7 +110,7 @@ Blockly.Blocks['display_update_text'] = {
         .appendField(new Blockly.FieldDropdown([["replacing old text.", "REPLACE"], ["adding to old text.", "APPEND"]]), "WRITETYPE");
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
-    this.setColour(260);
+    this.setColour(60);
     this.setTooltip('');
     this.setHelpUrl('http://www.example.com/');
   }
@@ -172,6 +145,32 @@ Blockly.JavaScript['display_clear_text'] = function(block) {
   return code;
 };
 
+//speech_speak block links to a String input and says the String aloud upon execution
+Blockly.Blocks['speech_speak'] = {
+  init: function() {
+    this.appendValueInput("TO_SAY")
+        .setCheck("String")
+        .appendField("Say");
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(30);
+    this.setTooltip('');
+    this.setHelpUrl('http://www.example.com/');
+  }
+};
+
+Blockly.JavaScript['speech_speak'] = function(block) {
+  var value_to_say = Blockly.JavaScript.valueToCode(block, 'TO_SAY', Blockly.JavaScript.ORDER_ATOMIC);
+  var code;
+  if (value_to_say !== '' && value_to_say !== null){
+    code = 'globalSay(' + value_to_say + ');\n';
+  }  
+  else{
+    code = '\n';
+  }
+  return code;
+};
+
 /** helper function for the 'speech_set_voice' block;
  * @param {!Array.<SpeechSynthesisVoice>} the available voices
  * @return {!Array.<!Array.<string>>} the dropdown options 
@@ -201,7 +200,7 @@ window.speechSynthesis.onvoiceschanged = function(){
             .appendField(new Blockly.FieldDropdown(getVoicesForBlock(voices)), "VOICES");
         this.setPreviousStatement(true, null);
         this.setNextStatement(true, null);
-        this.setColour(260);
+        this.setColour(30);
         this.setTooltip('');
         this.setHelpUrl('http://www.example.com/');
       }
@@ -229,7 +228,7 @@ Blockly.Blocks['speech_set_volume'] = {
         .appendField("Set volume to (between 0 and 1)");
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
-    this.setColour(210);
+    this.setColour(30);
     this.setTooltip('');
     this.setHelpUrl('http://www.example.com/');
   }
@@ -251,7 +250,7 @@ Blockly.Blocks['speech_set_rate'] = {
         .appendField("Set speech rate to (between .1 and 10)");
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
-    this.setColour(210);
+    this.setColour(30);
     this.setTooltip('');
     this.setHelpUrl('http://www.example.com/');
   }
