@@ -13,6 +13,8 @@
   <script src="../../php_compressed.js"></script>
   <script src="../../lua_compressed.js"></script>
   <script src="../../dart_compressed.js"></script>
+  <script src="../speech/speech.js"></script>
+  <script src="../speech/blocks.js"></script>
   <script src="code.js"></script>
 </head>
 <body>
@@ -83,6 +85,40 @@
       <block type="logic_null"></block>
       <block type="logic_ternary"></block>
     </category>
+
+    <category name="Listen" colour="0">
+      <block type="listen_if">
+         <value name="WORD">
+          <shadow type="text"></shadow>
+        </value>
+      </block>
+      <block type="listen_bool">
+         <value name="WORD">
+          <shadow type="text"></shadow>
+        </value>
+      </block>
+      <block type="listen_text"></block>
+    </category>
+    <category name="Display" colour="60">
+      <block type="display_img"></block>
+      <block type="display_text">
+       <value name="DISPLAY_TEXT">
+          <shadow type="text"></shadow>
+        </value>
+      </block>
+      <block type="display_pause">
+        <value name="TIME">
+          <shadow type="math_number">
+            <field name="NUM">1000</field>
+          </shadow>
+        </value>
+      </block>
+    </category>
+    <category name="Speak" colour="300">
+      <block type="speech_speak"></block>
+    </category>
+
+
     <category id="catLoops" colour="120">
       <block type="controls_repeat_ext">
         <value name="TIMES">
