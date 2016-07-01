@@ -61,7 +61,7 @@ var runCode = function() {
       localRecognizer.onresult = function() {
           var speechResult = event.results[0][0].transcript;
           logMessage(myInterpreter, 'You said: \"' + speechResult + '\"');
-          callback(myInterpreter.createPrimitive(speechResult == word));
+          callback(myInterpreter.createPrimitive(new String(speechResult).valueOf() == new String(word).valueOf() ));
       };
     };
     myInterpreter.setProperty(scope,'listen_branch', myInterpreter.createAsyncFunction(listenBranchWrapper));
@@ -93,7 +93,7 @@ var runCode = function() {
     //pause
     var pauseWrapper = function(time,callback) {
       time = time ? time.toString() : '';
-      timeVar = parseInt(time);
+      var timeVar = parseInt(time);
       window.console.log(timeVar);  
       var resume = function() {
         callback();
@@ -266,3 +266,5 @@ var updateGrammars = function(myRecognizer) {
   myRecognizer.interimResults = false;
   myRecognizer.maxAlternatives = 1;
 };
+
+ 

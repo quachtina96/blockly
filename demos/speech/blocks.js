@@ -37,7 +37,7 @@ Blockly.Blocks['listen_bool'] = {
 Blockly.JavaScript['listen_bool'] = function(block) {
     var text_word = Blockly.JavaScript.valueToCode(block, 'WORD', Blockly.JavaScript.ORDER_ATOMIC);
     addRecognizableWord(text_word);
-    var code = 'listen_branch('+Blockly.JavaScript.quote_(text_word)+')';
+    var code = 'listen_branch('+text_word+')';
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
