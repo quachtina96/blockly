@@ -25,7 +25,8 @@
   <script src="JS-Interpreter/acorn.js"></script>
   <script src="JS-Interpreter/interpreter.js"></script>
   <script src="blocks.js"></script>
-    
+  <script src="speech.js"></script>
+
   <style>
     html, body {
       height: 100%;
@@ -47,6 +48,28 @@
     aside {
       float: right;
       width: 30%;
+    }
+    button {
+      border-radius: 4px;
+      border: 1px solid #ddd;
+      background-color: #eee;
+      color: #000;
+      padding: 10px;
+      margin: 0 5px;
+      font-size: large;
+    }
+    button:hover:not(:disabled) {
+      box-shadow: 2px 2px 5px #888;
+    }
+    button:disabled {
+      opacity: 0.6;
+    }
+    button>* {
+      opacity: 0.6;
+      vertical-align: text-bottom;
+    }
+    button:hover:not(:disabled)>* {
+      opacity: 1;
     }
   </style>
 </head>
@@ -79,267 +102,353 @@
   <section id="blocklyDiv" style= "height: 480px; width: 900px;"></div>    
 
   <xml id="toolbox" style="display: none">
-    <category name="Listen">
-      <block type="listen_if"></block>
-      <block type="listen_bool"></block>
+    
+    <category name="Listen" colour="0">
+      <block type="listen_if">
+         <value name="WORD">
+          <shadow type="text"></shadow>
+        </value>
+      </block>
+      <block type="listen_bool">
+         <value name="WORD">
+          <shadow type="text"></shadow>
+        </value>
+      </block>
       <block type="listen_text"></block>
     </category>
-    <category name="Display">
+    <category name="Display" colour="60">
       <block type="display_img"></block>
-      <block type="display_update_text"></block>
       <block type="display_clear_text"></block>
-      <block type="display_pause"></block>
-    </category>
-    <category name="Usual">
-      <block type="math_number"></block>
-      <block type="controls_if"></block>
-      <block type="logic_compare"></block>
-      <block type="controls_repeat_ext"></block>
-      <block type="math_number"></block>
-      <block type="math_arithmetic"></block>
-    </category>
-    <category name="Text">
-      <block type="text"></block>
-      <block type="text_print"></block>
+      <block type="display_update_text">
+       <value name="DISPLAY_TEXT">
+          <shadow type="text"></shadow>
+        </value>
+      </block>
+      <block type="display_pause">
+        <value name="TIME">
+          <shadow type="math_number">
+            <field name="NUM">1000</field>
+          </shadow>
+        </value>
+      </block>
     </category>
     <category name="Speak">
       <block type="speech_speak"></block>
       <block type="speech_set_voice"></block>
       <block type="speech_set_volume"></block>
       <block type="speech_set_rate"></block>
+    </category>
+    <category name="Logic" colour="210">
+      <block type="controls_if"></block>
+      <block type="logic_compare"></block>
+      <block type="logic_operation"></block>
+      <block type="logic_negate"></block>
+      <block type="logic_boolean"></block>
+      <block type="logic_null"></block>
+      <block type="logic_ternary"></block>
+    </category>
+    <category name="Loops" colour="120">
+      <block type="controls_repeat_ext">
+        <value name="TIMES">
+          <shadow type="math_number">
+            <field name="NUM">10</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="controls_whileUntil"></block>
+      <block type="controls_for">
+        <value name="FROM">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+        <value name="TO">
+          <shadow type="math_number">
+            <field name="NUM">10</field>
+          </shadow>
+        </value>
+        <value name="BY">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="controls_forEach"></block>
+      <block type="controls_flow_statements"></block>
+    </category>
+    <category name="Math" colour="230">
+      <block type="math_number"></block>
+      <block type="math_arithmetic">
+        <value name="A">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+        <value name="B">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_single">
+        <value name="NUM">
+          <shadow type="math_number">
+            <field name="NUM">9</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_trig">
+        <value name="NUM">
+          <shadow type="math_number">
+            <field name="NUM">45</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_constant"></block>
+      <block type="math_number_property">
+        <value name="NUMBER_TO_CHECK">
+          <shadow type="math_number">
+            <field name="NUM">0</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_change">
+        <value name="DELTA">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_round">
+        <value name="NUM">
+          <shadow type="math_number">
+            <field name="NUM">3.1</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_on_list"></block>
+      <block type="math_modulo">
+        <value name="DIVIDEND">
+          <shadow type="math_number">
+            <field name="NUM">64</field>
+          </shadow>
+        </value>
+        <value name="DIVISOR">
+          <shadow type="math_number">
+            <field name="NUM">10</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_constrain">
+        <value name="VALUE">
+          <shadow type="math_number">
+            <field name="NUM">50</field>
+          </shadow>
+        </value>
+        <value name="LOW">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+        <value name="HIGH">
+          <shadow type="math_number">
+            <field name="NUM">100</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_random_int">
+        <value name="FROM">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+        <value name="TO">
+          <shadow type="math_number">
+            <field name="NUM">100</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_random_float"></block>
+    </category>
+    <category name="Text" colour="160">
+      <block type="text"></block>
+      <block type="text_join"></block>
+      <block type="text_append">
+        <value name="TEXT">
+          <shadow type="text"></shadow>
+        </value>
+      </block>
+      <block type="text_length">
+        <value name="VALUE">
+          <shadow type="text">
+            <field name="TEXT">abc</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="text_isEmpty">
+        <value name="VALUE">
+          <shadow type="text">
+            <field name="TEXT"></field>
+          </shadow>
+        </value>
+      </block>
+      <block type="text_indexOf">
+        <value name="VALUE">
+          <block type="variables_get">
+            <field name="VAR">text</field>
+          </block>
+        </value>
+        <value name="FIND">
+          <shadow type="text">
+            <field name="TEXT">abc</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="text_charAt">
+        <value name="VALUE">
+          <block type="variables_get">
+            <field name="VAR">text</field>
+          </block>
+        </value>
+      </block>
+      <block type="text_getSubstring">
+        <value name="STRING">
+          <block type="variables_get">
+            <field name="VAR">text</field>
+          </block>
+        </value>
+      </block>
+      <block type="text_changeCase">
+        <value name="TEXT">
+          <shadow type="text">
+            <field name="TEXT">abc</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="text_trim">
+        <value name="TEXT">
+          <shadow type="text">
+            <field name="TEXT">abc</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="text_print">
+        <value name="TEXT">
+          <shadow type="text">
+            <field name="TEXT">abc</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="text_prompt_ext">
+        <value name="TEXT">
+          <shadow type="text">
+            <field name="TEXT">abc</field>
+          </shadow>
+        </value>
+      </block>
+    </category>
+    <category name="Lists" colour="260">
+      <block type="lists_create_with">
+        <mutation items="0"></mutation>
+      </block>
+      <block type="lists_create_with"></block>
+      <block type="lists_repeat">
+        <value name="NUM">
+          <shadow type="math_number">
+            <field name="NUM">5</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="lists_length"></block>
+      <block type="lists_isEmpty"></block>
+      <block type="lists_indexOf">
+        <value name="VALUE">
+          <block type="variables_get">
+            <field name="VAR">list</field>
+          </block>
+        </value>
+      </block>
+      <block type="lists_getIndex">
+        <value name="VALUE">
+          <block type="variables_get">
+            <field name="VAR">list</field>
+          </block>
+        </value>
+      </block>
+      <block type="lists_setIndex">
+        <value name="LIST">
+          <block type="variables_get">
+            <field name="VAR">list</field>
+          </block>
+        </value>
+      </block>
+      <block type="lists_getSublist">
+        <value name="LIST">
+          <block type="variables_get">
+            <field name="VAR">list</field>
+          </block>
+        </value>
+      </block>
+      <block type="lists_split">
+        <value name="DELIM">
+          <shadow type="text">
+            <field name="TEXT">,</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="lists_sort"></block>
+    </category>
+    <category name="Colour" colour="20">
+      <block type="colour_picker"></block>
+      <block type="colour_random"></block>
+      <block type="colour_rgb">
+        <value name="RED">
+          <shadow type="math_number">
+            <field name="NUM">100</field>
+          </shadow>
+        </value>
+        <value name="GREEN">
+          <shadow type="math_number">
+            <field name="NUM">50</field>
+          </shadow>
+        </value>
+        <value name="BLUE">
+          <shadow type="math_number">
+            <field name="NUM">0</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="colour_blend">
+        <value name="COLOUR1">
+          <shadow type="colour_picker">
+            <field name="COLOUR">#ff0000</field>
+          </shadow>
+        </value>
+        <value name="COLOUR2">
+          <shadow type="colour_picker">
+            <field name="COLOUR">#3333ff</field>
+          </shadow>
+        </value>
+        <value name="RATIO">
+          <shadow type="math_number">
+            <field name="NUM">0.5</field>
+          </shadow>
+        </value>
+      </block>
+    </category>
+    <sep></sep>
+    <category name="Variables" colour="330" custom="VARIABLE"></category>
+    <category name="Functions" colour="290" custom="PROCEDURE"></category>
+
   </xml>
   </section>
 
   <script>
-
-    var recognizableWords = []; //keeps track of all the words that the recognizer should listen for
-
-    var workspace = Blockly.inject('blocklyDiv',  
+  var workspace = Blockly.inject('blocklyDiv',  
         {media: '../../media/',
          toolbox: document.getElementById('toolbox')});
-
-    //allows for portability across different browsers
-    var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
-    var SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList;
-    var SpeechRecognitionEvent = SpeechRecognitionEvent ||webkitSpeechRecognitionEvent;
-    var msg = new SpeechSynthesisUtterance();
-    //var voices;
-
-    //associated with the "Show Javascript button", outputs the code in an alert window
-    //TODO(edauterman): Figure out how to format the code correctly in the HTML (with line breaks)
-    function showCode() {   
-      Blockly.JavaScript.INFINITE_LOOP_TRAP = null;
-      var code = "Your code: \n" + Blockly.JavaScript.workspaceToCode(workspace);
-      document.getElementById('logText').textContent = code;
-      alert(code);
-    }
-
-    // Generate JavaScript code and run it using the JS Interpreter, prints code to console for debugging. Defines wrappers (syncronously and asyncronously) to handle certain blocks
-    //TODO(edauterman): Is there a way to decompose initFunc better while not creating any scoping problems?
-    function runCode() {
-      var code = Blockly.JavaScript.workspaceToCode(workspace);
-      window.console.log(code);
-
-      //used to define wrappers for myInterpreter
-      var initFunc = function(myInterpreter,scope) {
-
-        //alert
-        var wrapper = function(text) {
-          text = text ? text.toString() : '';
-          return myInterpreter.createPrimitive(alert(text));
-        };
-        myInterpreter.setProperty(scope, 'alert',
-            myInterpreter.createNativeFunction(wrapper));
-
-        //listen_branch, used for listen_if and listen_bool
-        var wrapper = function listen_branch(word, callback) {
-          word = word ? word.toString() : '';
-          var localRecognizer = new SpeechRecognition();
-          updateGrammars(localRecognizer);
-          localRecognizer.start();
-          window.console.log("Listening");
-          localRecognizer.onresult = function() {
-              window.console.log("Checking result.");
-              var speechResult = event.results[0][0].transcript;
-              window.console.log("You said: " + speechResult);
-              callback(myInterpreter.createPrimitive(speechResult == word));
-          };
-        };
-        myInterpreter.setProperty(scope,'listen_branch', myInterpreter.createAsyncFunction(wrapper));
-
-        //listen_text
-        var wrapper = function listen_text(callback) {
-          var localRecognizer = new SpeechRecognition();
-          updateGrammars(localRecognizer);
-          localRecognizer.start();
-          window.console.log("Listening");
-          localRecognizer.onresult = function() {
-              window.console.log("Checking result.");
-              var speechResult = event.results[0][0].transcript;
-              window.console.log("You said: " + speechResult);
-              callback(myInterpreter.createPrimitive(speechResult));
-          };
-        };
-        myInterpreter.setProperty(scope,'listen_text', myInterpreter.createAsyncFunction(wrapper));
-
-
-        //display_img
-        var wrapper = function(url) {
-          url = url ? url.toString() : '';
-          return myInterpreter.createPrimitive(window.document.getElementById('displayPic').src = url);
-        };
-        myInterpreter.setProperty(scope, 'displayImage',
-            myInterpreter.createNativeFunction(wrapper));
-
-        //pause
-        var wrapper = function(time,callback) {
-          time = time ? time.toString() : '';
-          timeVar = parseInt(time);
-          window.console.log(timeVar);  
-          var resume = function() {
-            window.console.log("Back!");
-            callback();
-          };
-          return myInterpreter.createPrimitive(window.setTimeout(resume,timeVar));
-        };
-        myInterpreter.setProperty(scope, 'pause',
-            myInterpreter.createAsyncFunction(wrapper));
-
-        //speech
-        var wrapper = function say(wordsToSay, callback){
-          wordsToSay = wordsToSay ? wordsToSay.toString() : '';
-          if ('speechSynthesis' in window) {
-            localMsg = new SpeechSynthesisUtterance(wordsToSay);
-            window.speechSynthesis.speak(localMsg);
-          // Synthesis support. Make your web apps talk!
-          } else {
-            console.log("speechSynthesis not found. Text to speech capability under Web Speech API not supported.")
-          }
-          localMsg.onend = function(e) {
-            callback();
-          };
-        };
-        myInterpreter.setProperty(scope, 'say', myInterpreter.createAsyncFunction(wrapper));
-
-        //clear the textArea div
-        var wrapper = function clearText(textAreaID){
-          textAreaID = textAreaID ? textAreaID.toString() : '';
-          var textArea;
-          myInterpreter.createPrimitive(textArea = document.getElementById(textAreaID));
-          while (textArea.hasChildNodes()) {
-            myInterpreter.createPrimitive(textArea.removeChild(textArea.lastChild));
-          };
-          return myInterpreter.createPrimitive(textArea);
-        };
-        myInterpreter.setProperty(scope, 'clearText', myInterpreter.createNativeFunction(wrapper));
-
-        //appendText to the given div within JSInterpreter
-        var wrapper = function appendText(elementType, text, textAreaID){
-          text = text ? text.toString() : '';
-          elementType = elementType ? elementType.toString() : '';
-          textAreaID = textAreaID ? textAreaID.toString() : '';
-
-          var node;
-          var textnode;
-          var textArea;
-          myInterpreter.createPrimitive(node = document.createElement(elementType));                 
-          myInterpreter.createPrimitive(textnode = document.createTextNode(text));  
-          myInterpreter.createPrimitive(textArea = document.getElementById(textAreaID));
-          myInterpreter.createPrimitive(node.appendChild(textnode));                              // Append the text to element
-          myInterpreter.createPrimitive(document.getElementById(textAreaID).appendChild(node)); 
-          return myInterpreter.createPrimitive(textArea);   // Append <li> to <ul> with id="myList"
-        }
-        myInterpreter.setProperty(scope, 'appendText', myInterpreter.createNativeFunction(wrapper));
-
-        var wrapper = function globalSay(wordsToSay, callback){
-          wordsToSay = wordsToSay ? wordsToSay.toString() : '';
-          if ('speechSynthesis' in window) {
-            msg.text = wordsToSay;
-            window.speechSynthesis.speak(msg);
-          // Synthesis support. Make your web apps talk!
-          } else {
-            console.log("speechSynthesis not found. Text to speech capability under Web Speech API not supported.")
-          }
-          msg.onend = function(e) {
-            callback();
-          };
-        };
-        myInterpreter.setProperty(scope, 'globalSay', myInterpreter.createAsyncFunction(wrapper)); 
-        
-        var wrapper = function getVoices() {
-          return myInterpreter.createPrimitive(window.speechSynthesis.getVoices());
-        };
-        myInterpreter.setProperty(scope, 'getVoices',
-            myInterpreter.createNativeFunction(wrapper));
-
-        var wrapper = function setVoice(newVoiceIndex) {
-          return myInterpreter.createPrimitive(msg.voice = voices[newVoiceIndex]);
-        };
-        myInterpreter.setProperty(scope, 'setVoice',
-            myInterpreter.createNativeFunction(wrapper));
-
-        var wrapper = function setVolume(newVolume) {
-          return myInterpreter.createPrimitive(msg.volume = newVolume);
-        };   
-        myInterpreter.setProperty(scope, 'setVolume',
-            myInterpreter.createNativeFunction(wrapper));    
-
-        var wrapper = function setRate(newRate) {
-          return myInterpreter.createPrimitive(msg.rate = newRate);
-        };   
-        myInterpreter.setProperty(scope, 'setRate',
-            myInterpreter.createNativeFunction(wrapper));    
-        
-      };
-      //initializes myInterpreter
-      var myInterpreter = new Interpreter(code,initFunc);
-      //runs myInterpreter
-      runButton(myInterpreter);
-    }
-
-    //taken from JS Interpreter example
-    function runButton(myInterpreter) {
-      if (myInterpreter.run()) {
-        // Ran until an async call.  Give this call a chance to run. Then start running again later.
-        setTimeout(runButton, 10, myInterpreter);
-      }
-    }
-    
-    //Add a word that the recognizer should be able to recognize from the user. Called from block code.
-
-    //TODO (edauterman): Is there a good way to remove words after the user has changed them so that the grammar list doesn't get "clogged up" with words that are used and then changed? Is this worthwhile or unnecessary?
-    function addRecognizableWord(word) {
-      recognizableWords[recognizableWords.length] = word;
-    }
-
-    //Uses the recognizableWords to generate a string to give to the recognizer in updateGrammars.
-    function convertRecognizableWordsToString() {
-      var grammarString = '#JSGF V1.0; grammar phrase; public <phrase> = ';
-      if (recognizableWords.length > 0) {
-        grammarString += recognizableWords[0];
-      }
-      for (var i=1; i<recognizableWords.length; i++) {
-        grammarString += ' | ' + recognizableWords[i];
-      }
-      grammarString += ';';
-      return grammarString;
-    }
-
-    //Takes as an argument the recognizer to update. Sets the settings using the grammar string and sets the language to US English. 
-
-    //TODO(edauterman): Should we add more choices for language for possible i18n?
-    function updateGrammars(myRecognizer) {
-      var grammar = convertRecognizableWordsToString();
-      var speechRecognitionList = new SpeechGrammarList();
-      speechRecognitionList.addFromString(grammar, 1);
-      myRecognizer.grammars = speechRecognitionList;
-      myRecognizer.lang = 'en-US';
-      myRecognizer.interimResults = false;
-      myRecognizer.maxAlternatives = 1;
-    }
-
-
   </script>
+
 
 </body>
 </html>

@@ -1,41 +1,41 @@
 //listen_if block executes a set of statements if the user says a specified word (entered in a text field)
 Blockly.Blocks['listen_if'] = {
   init: function() {
-    this.appendDummyInput()
-        .appendField("If you say")
-        .appendField(new Blockly.FieldTextInput("your special word"), "WORD");
+    this.appendValueInput("WORD")
+        .setCheck("String")
+        .appendField("If you say");
     this.appendStatementInput("DO")
         .setCheck(null);
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
-    this.setColour(260);
+    this.setColour(0);
     this.setTooltip('');
     this.setHelpUrl('http://www.example.com/');
   }
 };
 
 Blockly.JavaScript['listen_if'] = function(block) {
-    var text_word = block.getFieldValue('WORD');
+    var text_word = Blockly.JavaScript.valueToCode(block, 'WORD', Blockly.JavaScript.ORDER_ATOMIC);
     var statements_do = Blockly.JavaScript.statementToCode(block, 'DO');
     addRecognizableWord(text_word);
-    return 'if (listen_branch('+Blockly.JavaScript.quote_(text_word)+')) {\n' + statements_do + '}\n';
+    return 'if (listen_branch('+text_word+')) {\n' + statements_do + '}\n';
 };
 
 //listen_bool returns a boolean value, true if the user says a specified word and false otherwise
 Blockly.Blocks['listen_bool'] = {
   init: function() {
-    this.appendDummyInput()
-        .appendField("you say")
-        .appendField(new Blockly.FieldTextInput("your special word"), "WORD");
+    this.appendValueInput("WORD")
+        .setCheck("String")
+        .appendField("you say");
     this.setOutput(true, null);
-    this.setColour(260);
+    this.setColour(0);
     this.setTooltip('');
     this.setHelpUrl('http://www.example.com/');
   }
 };
 
 Blockly.JavaScript['listen_bool'] = function(block) {
-    var text_word = block.getFieldValue('WORD');
+    var text_word = Blockly.JavaScript.valueToCode(block, 'WORD', Blockly.JavaScript.ORDER_ATOMIC);
     addRecognizableWord(text_word);
     var code = 'listen_branch('+Blockly.JavaScript.quote_(text_word)+')';
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
@@ -47,7 +47,7 @@ Blockly.Blocks['listen_text'] = {
     this.appendDummyInput()
         .appendField("what you say");
     this.setOutput(true, "String");
-    this.setColour(260);
+    this.setColour(0);
     this.setTooltip('');
     this.setHelpUrl('http://www.example.com/');
   }
@@ -67,7 +67,7 @@ Blockly.Blocks['display_img'] = {
         .appendField(new Blockly.FieldTextInput("this link"), "IMG_SRC");
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
-    this.setColour(330);
+    this.setColour(60);
     this.setTooltip('');
     this.setHelpUrl('http://www.example.com/');
   }
@@ -87,12 +87,11 @@ Blockly.Blocks['display_pause'] = {
         .appendField("Pause for");
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
-    this.setColour(330);
+    this.setColour(60);
     this.setTooltip('');
     this.setHelpUrl('http://www.example.com/');
   }
 };
-
 
 Blockly.JavaScript['display_pause'] = function(block) {
   var value_time = Blockly.JavaScript.valueToCode(block, 'TIME', Blockly.JavaScript.ORDER_ATOMIC);
@@ -108,7 +107,7 @@ Blockly.Blocks['speech_speak'] = {
         .appendField("Say");
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
-    this.setColour(230);
+    this.setColour(300);
     this.setTooltip('');
     this.setHelpUrl('http://www.example.com/');
   }
@@ -127,7 +126,7 @@ Blockly.JavaScript['speech_speak'] = function(block) {
 };
 
 
-//updates the displayText div by either replacing or appending to current text.
+//updates the textArea div by either replacing or appending to current text.
 Blockly.Blocks['display_update_text'] = {
   init: function() {
     this.appendValueInput("UPDATE_TEXT")
@@ -155,13 +154,14 @@ Blockly.JavaScript['display_update_text'] = function(block) {
   return code;
 };
 
+//clears the textArea div
 Blockly.Blocks['display_clear_text'] = {
   init: function() {
     this.appendDummyInput()
         .appendField("Clear all text.");
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
-    this.setColour(260);
+    this.setColour(60);
     this.setTooltip('');
     this.setHelpUrl('http://www.example.com/');
   }
@@ -172,12 +172,10 @@ Blockly.JavaScript['display_clear_text'] = function(block) {
   return code;
 };
 
-//helper function for the 'speech_set_voice' block
-//@param none
-//@return formatted array of tuple arrays to supply as the dropdown options 
-//depends on the global voices array located in index.html
-
-
+/** helper function for the 'speech_set_voice' block;
+ * @param {!Array.<SpeechSynthesisVoice>} the available voices
+ * @return {!Array.<!Array.<string>>} the dropdown options 
+ */
 var getVoicesForBlock = function(voices){
   var dropdown = [];
   for (i = 0; i < voices.length; i++){
@@ -187,8 +185,14 @@ var getVoicesForBlock = function(voices){
   return dropdown;
 }
 
-var voices;
+
+/** the voice list is loaded async to the page. An onvoiceschanged event is fired when they are loaded.
+ *  http://stackoverflow.com/questions/21513706/getting-the-list-of-voices-in-speechsynthesis-of-chrome-web-speech-api
+ */
+var voices; 
+ // wait on voices to be loaded before fetching list
 window.speechSynthesis.onvoiceschanged = function(){
+    //voices becomes {!Array.<SpeechSynthesisVoice>}
     voices = window.speechSynthesis.getVoices();
     Blockly.Blocks['speech_set_voice'] = {
       init: function() {
@@ -204,6 +208,8 @@ window.speechSynthesis.onvoiceschanged = function(){
     };
 };
 
+//set voice based on user's dropdown choice
+//default is Alex
 Blockly.JavaScript['speech_set_voice'] = function(block) {
   var dropdown_name = block.getFieldValue('VOICES');
   // var newVoice = voices[parseInt(dropdown_name)];
@@ -215,6 +221,7 @@ Blockly.JavaScript['speech_set_voice'] = function(block) {
   return code;
 };
 
+//set volume of speech
 Blockly.Blocks['speech_set_volume'] = {
   init: function() {
     this.appendValueInput("VOLUME")
@@ -236,6 +243,7 @@ Blockly.JavaScript['speech_set_volume'] = function(block) {
   return code;
 };
 
+//set rate of speech
 Blockly.Blocks['speech_set_rate'] = {
   init: function() {
     this.appendValueInput("RATE")
