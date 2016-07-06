@@ -5,6 +5,6 @@
 /tests/jsunit/*
 /tests/generators/*
 /generators/*
--/demos/*
+/demos/*
 /accessible/*
 /appengine/*
