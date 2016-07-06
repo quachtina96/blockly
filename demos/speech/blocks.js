@@ -60,7 +60,6 @@ Blockly.JavaScript['listen_text'] = function(block) {
 };
 
 //display_img displays an image in a section of the page using the provided link
-//TODO(edauterman): Is this a security problem?
 Blockly.Blocks['display_img'] = {
   init: function() {
     this.appendDummyInput()
