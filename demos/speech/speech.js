@@ -130,6 +130,9 @@ var runCode = function() {
      * @param {int} time Number of milliseconds to pause execution
      * @param {function} callback Used by JS Interpreter to resume execution after blocking.
      */
+
+    var timeVar; 
+    
     var pauseWrapper = function(time,callback) {
       time = time ? time.toString() : '';
       timeVar = parseInt(time);
