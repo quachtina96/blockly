@@ -4,6 +4,7 @@
 /core/css.js
 /tests/jsunit/*
 /tests/generators/*
+-/demos/*
 /generators/*
 /accessible/*
 /appengine/*
