@@ -6,6 +6,10 @@ var recognizableWords = []; //keeps track of all the words that the recognizer s
     {media: '../../media/',
      toolbox: document.getElementById('toolbox')});*/
 
+if (!('webkitSpeechRecognition' in window)) {
+  alert("Speech recognition and speech synthesis not supported. Please use Chrome to run this demo.");
+}
+
 //allows for portability across different browsers
 var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
 var SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList;
@@ -69,7 +73,7 @@ var runCode = function() {
         localRecognizer.onresult = function() {
           var speechResult = formatText(event.results[0][0].transcript);
           logMessage(myInterpreter, 'You said: \"' + speechResult + '\"\n');
-          callback(myInterpreter.createPrimitive(new String(speechResult).valueOf() == new String(word).valueOf()));
+          callback(myInterpreter.createPrimitive(speechResult == word));
         };
         localRecognizer.onnomatch = function() {
           logMessage(myInterpreter,"Done listening. Didn't hear anything.");
@@ -127,12 +131,12 @@ var runCode = function() {
      * Wrapper to pause execution for a certain number of milliseconds and then resume execution. Uses JS 
      * Interpreter to make this an asynchronous function so that execution blocks until the user says a word
      * and the word is processed. Used in pause.
-     * @param {int} time Number of milliseconds to pause execution
+     * @param {float} time Number of milliseconds to pause execution
      * @param {function} callback Used by JS Interpreter to resume execution after blocking.
      */
 
     var timeVar; 
-    
+
     var pauseWrapper = function(time,callback) {
       time = time ? time.toString() : '';
       timeVar = parseInt(time);

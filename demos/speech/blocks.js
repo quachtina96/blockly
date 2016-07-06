@@ -3,7 +3,7 @@ Blockly.Blocks['listen_if'] = {
   init: function() {
     this.appendValueInput("WORD")
         .setCheck("String")
-        .appendField("If you say");
+        .appendField("if you say");
     this.appendStatementInput("DO")
         .setCheck(null);
     this.setPreviousStatement(true, null);
@@ -63,7 +63,7 @@ Blockly.JavaScript['listen_text'] = function(block) {
 Blockly.Blocks['display_img'] = {
   init: function() {
     this.appendDummyInput()
-        .appendField("Display image at")
+        .appendField("display image at")
         .appendField(new Blockly.FieldTextInput("this link"), "IMG_SRC");
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
@@ -84,9 +84,9 @@ Blockly.Blocks['display_pause'] = {
   init: function() {
     this.appendValueInput("TIME")
         .setCheck("Number")
-        .appendField("Pause for");
+        .appendField("pause for");
     this.appendDummyInput()
-        .appendField("milliseconds");
+        .appendField("seconds");
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour(60);
@@ -97,6 +97,7 @@ Blockly.Blocks['display_pause'] = {
 
 Blockly.JavaScript['display_pause'] = function(block) {
   var value_time = Blockly.JavaScript.valueToCode(block, 'TIME', Blockly.JavaScript.ORDER_ATOMIC);
+  value_time *= 1000;
   var code = 'pause('+value_time+');\n';
   return code;
 };
@@ -106,10 +107,10 @@ Blockly.Blocks['display_update_text'] = {
   init: function() {
     this.appendValueInput("UPDATE_TEXT")
         .setCheck("String")
-        .appendField("Write");
+        .appendField("write");
     this.appendDummyInput()
         .appendField("by")
-        .appendField(new Blockly.FieldDropdown([["replacing old text.", "REPLACE"], ["adding to old text.", "APPEND"]]), "WRITETYPE");
+        .appendField(new Blockly.FieldDropdown([["replacing old text", "REPLACE"], ["adding to old text", "APPEND"]]), "WRITETYPE");
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour(60);
@@ -133,7 +134,7 @@ appendText("p", '+ value_update_text + ',"textArea");\n';
 Blockly.Blocks['display_clear_text'] = {
   init: function() {
     this.appendDummyInput()
-        .appendField("Clear all text.");
+        .appendField("clear all text");
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour(60);
@@ -152,7 +153,7 @@ Blockly.Blocks['speech_speak'] = {
   init: function() {
     this.appendValueInput("TO_SAY")
         .setCheck("String")
-        .appendField("Say");
+        .appendField("say");
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour(30);
@@ -198,7 +199,7 @@ window.speechSynthesis.onvoiceschanged = function(){
     Blockly.Blocks['speech_set_voice'] = {
       init: function() {
         this.appendDummyInput()
-            .appendField("Set voice to")
+            .appendField("set voice to")
             .appendField(new Blockly.FieldDropdown(getVoicesForBlock(voices)), "VOICES");
         this.setPreviousStatement(true, null);
         this.setNextStatement(true, null);
@@ -227,7 +228,7 @@ Blockly.Blocks['speech_set_volume'] = {
   init: function() {
     this.appendValueInput("VOLUME")
         .setCheck("Number")
-        .appendField("Set volume to (between 0 and 1)");
+        .appendField("set volume to (between 0 and 1)");
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour(30);
@@ -249,7 +250,7 @@ Blockly.Blocks['speech_set_rate'] = {
   init: function() {
     this.appendValueInput("RATE")
         .setCheck("Number")
-        .appendField("Set speech rate to (between .1 and 10)");
+        .appendField("set speech rate to (between .1 and 10)");
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour(30);
@@ -263,5 +264,32 @@ Blockly.JavaScript['speech_set_rate'] = function(block) {
   var code = '';
   if (value_rate >= .1 && value_rate <= 10)
     code = 'setRate('+ value_rate+');\n';
+  return code;
+};
+
+Blockly.Blocks['speech_say_and_write'] = {
+  init: function() {
+    this.appendValueInput("TEXT")
+        .setCheck("String")
+        .appendField("say and write");
+    this.appendDummyInput()
+        .appendField("by")
+        .appendField(new Blockly.FieldDropdown([["replacing old text", "REPLACE"], ["adding to old text", "APPEND"]]), "WRITE_TYPE");
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(30);
+    this.setTooltip('');
+    this.setHelpUrl('http://www.example.com/');
+  }
+};
+
+Blockly.JavaScript['speech_say_and_write'] = function(block) {
+  var value_update_text = Blockly.JavaScript.valueToCode(block, 'TEXT', Blockly.JavaScript.ORDER_ATOMIC);
+  var dropdown_write_type = block.getFieldValue('WRITE_TYPE');
+    var code = 'if(' + Blockly.JavaScript.quote_(dropdown_write_type) + ' == "REPLACE"){\n\
+      clearText("textArea");\n\
+    }\n\
+    appendText("p", '+ value_update_text + ',"textArea");\n\
+    globalSay('+ value_update_text+');\n';
   return code;
 };
