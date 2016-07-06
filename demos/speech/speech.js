@@ -15,21 +15,18 @@ var msg = new SpeechSynthesisUtterance();
 
 /**
  * Associated with the "Show Javascript button", outputs the code in an alert window
- * TODO(edauterman): Figure out how to format the code correctly in the HTML (with line breaks)
  */
 var showCode = function() {   
   Blockly.JavaScript.INFINITE_LOOP_TRAP = null;
-  var code = "<pre>" + Blockly.JavaScript.workspaceToCode(workspace) + "</pre>";
-  //document.getElementById('logText').innerHTML = code;
+  var code = Blockly.JavaScript.workspaceToCode(workspace);
   alert(code);
 };
 
 
 /**
  * Generate JavaScript code and run it using the JS Interpreter, prints code to console for debugging. Defines 
- * wrappers (syncronously and asyncronously) to handle certain blocks
- * TODO(edauterman): Is there a way to decompose initFunc better while not creating any scoping problems? 
- * TODO(edauterman): Remove names after function and give them unique names. 
+ * wrappers (syncronously and asyncronously) to handle certain blocks that cannot be handled by the JS Interpreter
+ * internally.
  * NOTE: If move the wrapper functions outside of runCode, then myInterpreter is not in scope (needs to be a 
  * local because it needs to be recreated each time to allow for changes to code), and myInterpreter can't be
  * passed as an argument because the order and type of arguments is defined by JS Interpreter.
@@ -41,7 +38,10 @@ var runCode = function() {
   //used to define wrappers for myInterpreter
   var initFunc = function(myInterpreter,scope) {
 
-    //alert
+    /**
+     * Wrapper to define alert. Taken from JS Interpreter documentation on Blockly developer site. 
+     * @param {String} text to be displayed
+     */
     var alertWrapper = function(text) {
       text = text ? text.toString() : '';
       return myInterpreter.createPrimitive(alert(text));
@@ -49,31 +49,45 @@ var runCode = function() {
     myInterpreter.setProperty(scope, 'alert',
         myInterpreter.createNativeFunction(alertWrapper));
 
-    // WRAPPERS FOR SPEECH RECOGNITION
-    //listen_branch, used for listen_if and listen_bool
+    //Listen blocks
+
+    /**
+     * Wrapper to return a boolean if what the user says matches word. Uses JS Interpreter to make this an 
+     * asynchronous function so that execution blocks until the user says a word and the word is processed. 
+     * Assumes word has been formatted to be in lower case with no extraneous characters (using formatText).
+     * Used in listen_if and listen_bool.
+     * @param {String} word The word to be compared against
+     * @param {fuction} callback The callback used by JS Interpreter to resume execution
+     * @return {boolean} true if the word the user says equals word, false otherwise
+     */
     var listenBranchWrapper = function(word,callback) {
-      word = word ? word.toString() : '';
-      var localRecognizer = new SpeechRecognition();
-      updateGrammars(localRecognizer);
-      localRecognizer.start();
-      logMessage(myInterpreter,"Listening...");
-      localRecognizer.onresult = function() {
-        var speechResult = formatText(event.results[0][0].transcript);
-        logMessage(myInterpreter, 'You said: \"' + speechResult + '\"\n');
-        callback(myInterpreter.createPrimitive(new String(speechResult).valueOf() == new String(word).valueOf()));
-      };
-      localRecognizer.onnomatch = function() {
-        logMessage(myInterpreter,"Done listening. Didn't hear anything.");
-        callback(myInterpreter.createPrimitive(false));
-      };
-      localRecognizer.onerror = function() {
-        logMessage(myInterpreter,"Done listening. Error.");
-        callback(myInterpreter.createPrimitive(false));
+        word = word ? word.toString() : '';
+        var localRecognizer = new SpeechRecognition();
+        updateGrammars(localRecognizer);
+        localRecognizer.start();
+        logMessage(myInterpreter,"Listening...");
+        localRecognizer.onresult = function() {
+          var speechResult = formatText(event.results[0][0].transcript);
+          logMessage(myInterpreter, 'You said: \"' + speechResult + '\"\n');
+          callback(myInterpreter.createPrimitive(new String(speechResult).valueOf() == new String(word).valueOf()));
+        };
+        localRecognizer.onnomatch = function() {
+          logMessage(myInterpreter,"Done listening. Didn't hear anything.");
+          callback(myInterpreter.createPrimitive(false));
+        };
+        localRecognizer.onerror = function() {
+          logMessage(myInterpreter,"Done listening. Error.");
+          callback(myInterpreter.createPrimitive(false));
       };
     };
-    myInterpreter.setProperty(scope,'listen_branch', myInterpreter.createAsyncFunction(listenBranchWrapper));
+  myInterpreter.setProperty(scope,'listen_branch', myInterpreter.createAsyncFunction(listenBranchWrapper));
 
-    //listen_text
+    /**
+     * Wrapper to return the string the user said. Uses JS Interpreter to make this an asynchronous function so
+     * that execution blocks until the user says a word and the word is processed. Used in listen_text.
+     * @param {function} callback Used by JS Interpreter to resume execution after blocking
+     * @return {String} returns the string the user spoke
+     */
     var listenTextWrapper = function(callback) {
       var localRecognizer = new SpeechRecognition();
       updateGrammars(localRecognizer);
@@ -84,10 +98,24 @@ var runCode = function() {
           logMessage(myInterpreter, 'You said: \"' + speechResult + '\"');
           callback(myInterpreter.createPrimitive(speechResult));
       };
+      localRecognizer.onnomatch = function() {
+          logMessage(myInterpreter,"Done listening. No match found.");
+          callback(myInterpreter.createPrimitive(false));
+      };
+      localRecognizer.onerror = function() {
+          logMessage(myInterpreter,"Done listening. Error.");
+          callback(myInterpreter.createPrimitive(false));
+      };
     };
     myInterpreter.setProperty(scope,'listen_text', myInterpreter.createAsyncFunction(listenTextWrapper));
 
-    //display_img
+    //Display blocks
+
+    /**
+     * Wrapper to update the displayed image in HTML div element displayPic. Needs to be done in wrapper because
+     * JS Interpreter can't access displayPic internally. Used in display_img.
+     * @param {String} url The URL of the picture to be displayed.
+     */
     var imageWrapper = function(url) {
       url = url ? url.toString() : '';
       return myInterpreter.createPrimitive(window.document.getElementById('displayPic').src = url);
@@ -95,7 +123,13 @@ var runCode = function() {
     myInterpreter.setProperty(scope, 'displayImage',
         myInterpreter.createNativeFunction(imageWrapper));
 
-    //pause
+    /**
+     * Wrapper to pause execution for a certain number of milliseconds and then resume execution. Uses JS 
+     * Interpreter to make this an asynchronous function so that execution blocks until the user says a word
+     * and the word is processed. Used in pause.
+     * @param {int} time Number of milliseconds to pause execution
+     * @param {function} callback Used by JS Interpreter to resume execution after blocking.
+     */
     var pauseWrapper = function(time,callback) {
       time = time ? time.toString() : '';
       timeVar = parseInt(time);
@@ -132,50 +166,6 @@ var runCode = function() {
     myInterpreter.setProperty(scope, 'updateTextDisplay',
         myInterpreter.createNativeFunction(textWrapper));
 
-    //listen_text
-    var listenTextWrapper = function(callback) {
-      var localRecognizer = new SpeechRecognition();
-      updateGrammars(localRecognizer);
-      localRecognizer.start();
-      logMessage(myInterpreter,"Listening...");
-      localRecognizer.onresult = function() {
-          var speechResult = event.results[0][0].transcript;
-          logMessage(myInterpreter, 'You said: \"' + speechResult + '\"');
-          callback(myInterpreter.createPrimitive(speechResult));
-      };
-      localRecognizer.onnomatch = function() {
-          logMessage(myInterpreter,"Done listening. No match found.");
-          callback(myInterpreter.createPrimitive(false));
-      };
-      localRecognizer.onerror = function() {
-          logMessage(myInterpreter,"Done listening. Error.");
-          callback(myInterpreter.createPrimitive(false));
-      };
-    };
-    myInterpreter.setProperty(scope,'listen_text', myInterpreter.createAsyncFunction(listenTextWrapper));
-
-    //WRAPPERS FOR MEDIA DISPLAY
-
-    //display_img
-    var imageWrapper = function(url) {
-      url = url ? url.toString() : '';
-      return myInterpreter.createPrimitive(window.document.getElementById('displayPic').src = url);
-    };
-    myInterpreter.setProperty(scope, 'displayImage',
-        myInterpreter.createNativeFunction(imageWrapper));
-
-    //pause
-    var pauseWrapper = function(time,callback) {
-      time = time ? time.toString() : '';
-      var timeVar = parseInt(time);
-      window.console.log(timeVar);  
-      var resume = function() {
-        callback();
-      };
-      return myInterpreter.createPrimitive(window.setTimeout(resume,timeVar));
-    };
-    myInterpreter.setProperty(scope, 'pause',
-        myInterpreter.createAsyncFunction(pauseWrapper));
 
     /** clear the textArea div
      * @param {String} id attribute of textAreaID
@@ -216,7 +206,7 @@ var runCode = function() {
     }
     myInterpreter.setProperty(scope, 'appendText', myInterpreter.createNativeFunction(appendTextWrapper));
 
-    //WRAPPERS FOR SPEECH SYNTHESIS
+    //Speech Synthesis blocks
 
     /** speak
      * @param {String, function}
@@ -298,8 +288,6 @@ var logMessage = function(myInterpreter, message) {
 
 /**
  * Add a word that the recognizer should be able to recognize from the user. Called from block code.
- * TODO (edauterman): Is there a good way to remove words after the user has changed them so that the grammar 
- * list doesn't get "clogged up" with words that are used and then changed? Is this worthwhile or unnecessary?
  * @param {string} word The word to be added to the list of recognizable words. 
  */
 
@@ -341,7 +329,12 @@ var updateGrammars = function(myRecognizer) {
   myRecognizer.maxAlternatives = 1;
 };
 
-//Given a String, gets rid of punctuation and capitalization--all words are left lowercase and separated by a single space
+/**
+ * Given a String, gets rid of punctuation and capitalization--all words are left lowercase and separated 
+ * by a single space
+ * @param {String} text Input for formatting
+ * @return {String} Formatted text
+ */
   var formatText = function (text){
     // if(text !== undefined){
       var punctuationless = text.replace(/[.,\/#!$%\^&\*;:{}—=\-_`~()]/g," "); //remove punctuation
