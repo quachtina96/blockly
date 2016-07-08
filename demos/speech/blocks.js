@@ -15,10 +15,10 @@ Blockly.Blocks['listen_if'] = {
 };
 
 Blockly.JavaScript['listen_if'] = function(block) {
-    var text_word = Blockly.JavaScript.valueToCode(block, 'WORD', Blockly.JavaScript.ORDER_ATOMIC);
-    var statements_do = Blockly.JavaScript.statementToCode(block, 'DO');
-    addRecognizableWord(text_word);
-    return 'if (listen_branch('+formatText(text_word)+')) {\n' + statements_do + '}\n';
+  var text_word = Blockly.JavaScript.valueToCode(block, 'WORD', Blockly.JavaScript.ORDER_ATOMIC);
+  var statements_do = Blockly.JavaScript.statementToCode(block, 'DO');
+  addRecognizableWord(text_word);
+  return 'if (listen_branch('+formatText(text_word)+')) {\n' + statements_do + '}\n';
 };
 
 //listen_bool returns a boolean value, true if the user says a specified word and false otherwise
@@ -35,11 +35,11 @@ Blockly.Blocks['listen_bool'] = {
 };
 
 Blockly.JavaScript['listen_bool'] = function(block) {
-    var text_word = Blockly.JavaScript.valueToCode(block, 'WORD', Blockly.JavaScript.ORDER_ATOMIC);
-    addRecognizableWord(text_word);
-    window.console.log(text_word + " "+ formatText(text_word));
-    var code = 'listen_branch('+formatText(text_word)+')';
-    return [code, Blockly.JavaScript.ORDER_ATOMIC];
+  var text_word = Blockly.JavaScript.valueToCode(block, 'WORD', Blockly.JavaScript.ORDER_ATOMIC);
+  addRecognizableWord(text_word);
+  window.console.log(text_word + " "+ formatText(text_word));
+  var code = 'listen_branch('+formatText(text_word)+')';
+  return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
 //listen_text returns a String containing what the user said
@@ -167,7 +167,7 @@ Blockly.JavaScript['speech_speak'] = function(block) {
   var code;
   if (value_to_say !== '' && value_to_say !== null){
     code = 'globalSay(' + value_to_say + ');\n';
-  }  
+  } 
   else{
     code = '\n';
   }
@@ -176,24 +176,38 @@ Blockly.JavaScript['speech_speak'] = function(block) {
 
 /** helper function for the 'speech_set_voice' block;
  * @param {!Array.<SpeechSynthesisVoice>} the available voices
- * @return {!Array.<!Array.<string>>} the dropdown options 
+ * @return {!Array.<!Array.<string>>} the dropdown options
  */
 var getVoicesForBlock = function(voices){
   var dropdown = [];
   for (i = 0; i < voices.length; i++){
     var voice = [voices[i].name, i.toString()];
     dropdown.push(voice);
-  };
+  }
   return dropdown;
-}
+};
 
 
 /** the voice list is loaded async to the page. An onvoiceschanged event is fired when they are loaded.
  *  http://stackoverflow.com/questions/21513706/getting-the-list-of-voices-in-speechsynthesis-of-chrome-web-speech-api
  */
-var voices; 
- // wait on voices to be loaded before fetching list
-window.speechSynthesis.onvoiceschanged = function(){
+var voices = window.speechSynthesis.getVoices();
+if (voices.length > 0){
+  Blockly.Blocks['speech_set_voice'] = {
+    init: function() {
+      this.appendDummyInput()
+          .appendField("set voice to")
+          .appendField(new Blockly.FieldDropdown(getVoicesForBlock(voices)), "VOICES");
+      this.setPreviousStatement(true, null);
+      this.setNextStatement(true, null);
+      this.setColour(30);
+      this.setTooltip('');
+      this.setHelpUrl('http://www.example.com/');
+    }
+  };
+} else {
+   // wait on voices to be loaded before fetching list
+  window.speechSynthesis.onvoiceschanged = function(){
     //voices becomes {!Array.<SpeechSynthesisVoice>}
     voices = window.speechSynthesis.getVoices();
     Blockly.Blocks['speech_set_voice'] = {
@@ -208,8 +222,8 @@ window.speechSynthesis.onvoiceschanged = function(){
         this.setHelpUrl('http://www.example.com/');
       }
     };
-};
-
+  };
+}
 //set voice based on user's dropdown choice
 //default is Alex
 Blockly.JavaScript['speech_set_voice'] = function(block) {
