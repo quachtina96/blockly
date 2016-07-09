@@ -2,12 +2,13 @@
 
 var recognizableWords = []; //keeps track of all the words that the recognizer should listen for
 
-/*var workspace = Blockly.inject('blocklyDiv',  
+var workspace = Blockly.inject('blocklyDiv',
     {media: '../../media/',
-     toolbox: document.getElementById('toolbox')});*/
+     toolbox: document.getElementById('toolbox')});
 
-if (!('webkitSpeechRecognition' in window)) {
-  alert("Speech recognition and speech synthesis not supported. Please use Chrome to run this demo.");
+if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+  alert("Speech recognition and speech synthesis not supported. Please use \
+    Chrome to run this demo.");
 }
 
 //allows for portability across different browsers
@@ -189,7 +190,7 @@ var runCode = function() {
       };
       return myInterpreter.createPrimitive(textArea);
     };
-    //denotes to the interpreter that upon calls to clearText, it should execute the wrapper function defined. 
+    //denotes to the interpreter that upon calls to clearText, it should execute the wrapper function defined.
     myInterpreter.setProperty(scope, 'clearText', myInterpreter.createNativeFunction(clearTextWrapper));
 
     /** appendText to the given div within JSInterpreter
