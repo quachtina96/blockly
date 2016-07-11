@@ -1,5 +1,13 @@
 /**
- * @fileoverview TODO(quacht)
+ * @fileoverview initializes the speech recongition and synthesis objects,
+ * defines helper functions for the demo and  functions to run custom
+ * blocks' code using JS Interpreter. Much of this exists in the form of wrapper
+ * functions. This file depends on the index.html (some functions edit the DOM),
+ * blocks.js (where the blocks' init functions and the global voices
+ * variable is defined), and blockgenerators.js (where the block generate code
+ * is defined).
+ *
+ * @author edauterman, quacht
  */
 
 'use strict';
@@ -18,7 +26,7 @@ speech.SpeechGrammarList = webkitSpeechGrammarList;
 speech.SpeechRecognitionEvent = webkitSpeechRecognitionEvent;
 
 //allows for portability across different browsers
-// TODO(quacht): going to talk to Neil about why the implementation below is
+// TODO(quacht): waiting to hear back from  Neil about why the implementation below is
 //causing issues.
 // speech.SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
 // speech.SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList;
