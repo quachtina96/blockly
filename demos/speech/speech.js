@@ -6,40 +6,51 @@
 //namespace
 var speech = {};
 //keeps track of all the words that the recognizer should listen for
-var recognizableWords = [];
+speech.recognizableWords = [];
 
 if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)){
   alert("Speech recognition and speech synthesis not supported. Please use \
     Chrome to run this demo.");
 }
 
+speech.SpeechRecognition = webkitSpeechRecognition;
+speech.SpeechGrammarList = webkitSpeechGrammarList;
+speech.SpeechRecognitionEvent = webkitSpeechRecognitionEvent;
+
 //allows for portability across different browsers
-var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
-var SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList;
-var SpeechRecognitionEvent = SpeechRecognitionEvent ||
-    webkitSpeechRecognitionEvent;
+// TODO(quacht): going to talk to Neil about why the implementation below is
+//causing issues.
+// speech.SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
+// speech.SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList;
+// speech.SpeechRecognitionEvent = SpeechRecognitionEvent ||
+//     webkitSpeechRecognitionEvent;
 
 //global instance whose attributes may be edited in order to affect speech
 //output
-var msg = new SpeechSynthesisUtterance();
+speech.msg = new SpeechSynthesisUtterance();
 
 /**
  * Associated with the "Show Javascript button", outputs the code in an alert
  * window
  */
-var showCode = function() {
+speech.showCode = function() {
   Blockly.JavaScript.INFINITE_LOOP_TRAP = null;
   var code = Blockly.JavaScript.workspaceToCode(workspace);
   alert(code);
 };
 
 /**
- * Used for logging messages from within the JS Interpreter. Prints it to the logging area and the console.
- * @param {Interpreter} myInterpreter The interpreter that is initialized and running the code.
- * @param {string} message The message that will be printed to the logging area and console
+ * Used for logging messages from within the JS Interpreter. Prints it to the
+ * logging area and the console.
+ *
+ * @param {Interpreter} myInterpreter - The interpreter that is initialized and
+ * running the code.
+ * @param {string} message - The message that will be printed to the logging
+ * area and console
  */
-var logMessage = function(myInterpreter, message) {
-  myInterpreter.createPrimitive(document.getElementById('logText').innerHTML = '<code>'+message+'</code>');
+speech.logMessage = function(myInterpreter, message) {
+  myInterpreter.createPrimitive(document.getElementById('logText').innerHTML =
+      '<code>'+message+'</code>');
   window.console.log(message);
 };
 
@@ -50,11 +61,11 @@ var logMessage = function(myInterpreter, message) {
  * @param {Interpreter} myInterpreter The interpreter that is initialized and
  * will run the code.
  */
-var runButton = function(myInterpreter) {
+speech.runButton = function(myInterpreter) {
   if (myInterpreter.run()) {
     // Ran until an async call.  Give this call a chance to run. Then start
     //running again later.
-    setTimeout(runButton, 10, myInterpreter);
+    setTimeout(speech.runButton, 10, myInterpreter);
   }
 };
 
@@ -69,7 +80,7 @@ var runButton = function(myInterpreter) {
  * passed as an argument because the order and type of arguments is defined by
  * JS Interpreter.
  */
-var runCode = function() {
+speech.runCode = function() {
   var code = Blockly.JavaScript.workspaceToCode(workspace);
   window.console.log(code);
 
@@ -106,24 +117,22 @@ var runCode = function() {
      */
     var listenBranchWrapper = function(word, callback) {
       word = word ? word.toString() : '';
-      var localRecognizer = new SpeechRecognition();
-      updateGrammars(localRecognizer);
-
+      var localRecognizer = speech.createSpeechRecognizer();
       localRecognizer.onresult = function() {
-        var speechResult = formatText(event.results[0][0].transcript);
-        logMessage(myInterpreter, 'You said: \"' + speechResult + '\"\n');
+        var speechResult = speech.formatText(event.results[0][0].transcript);
+        speech.logMessage(myInterpreter, 'You said: \"' + speechResult + '\"\n');
         callback(myInterpreter.createPrimitive(speechResult == word));
       };
       localRecognizer.onnomatch = function() {
-        logMessage(myInterpreter,"Done listening. Didn't hear anything.");
+        speech.logMessage(myInterpreter,"Done listening. Didn't hear anything.");
         callback(myInterpreter.createPrimitive(false));
       };
       localRecognizer.onerror = function() {
-        logMessage(myInterpreter,"Done listening. Error.");
+        speech.logMessage(myInterpreter,"Done listening. Error.");
         callback(myInterpreter.createPrimitive(false));
       };
       localRecognizer.start();
-        logMessage(myInterpreter,"Listening...");
+      speech.logMessage(myInterpreter,"Listening...");
     };
     myInterpreter.setProperty(scope,'listen_branch',
       myInterpreter.createAsyncFunction(listenBranchWrapper));
@@ -138,25 +147,23 @@ var runCode = function() {
      * after blocking. During runtime, the callback is provided by JSInterpeter
      */
     var listenTextWrapper = function(callback) {
-      var localRecognizer = new SpeechRecognition();
-      updateGrammars(localRecognizer);
-
+      var localRecognizer = speech.createSpeechRecognizer();
       localRecognizer.onresult = function() {
         var speechResult = event.results[0][0].transcript;
-        logMessage(myInterpreter, 'You said: \"' + speechResult + '\"');
+        speech.logMessage(myInterpreter, 'You said: \"' + speechResult + '\"');
         callback(myInterpreter.createPrimitive(speechResult));
       };
       localRecognizer.onnomatch = function() {
-        logMessage(myInterpreter,"Done listening. No match found.");
+        speech.logMessage(myInterpreter,"Done listening. No match found.");
         callback(myInterpreter.createPrimitive(false));
       };
       localRecognizer.onerror = function() {
-        logMessage(myInterpreter,"Done listening. Error.");
+        speech.logMessage(myInterpreter,"Done listening. Error.");
         callback(myInterpreter.createPrimitive(false));
       };
 
       localRecognizer.start();
-      logMessage(myInterpreter,"Listening...");
+      speech.logMessage(myInterpreter,"Listening...");
     };
     myInterpreter.setProperty(scope,'listen_text',
         myInterpreter.createAsyncFunction(listenTextWrapper));
@@ -211,14 +218,17 @@ var runCode = function() {
       textAreaID = textAreaID ? textAreaID.toString() : '';
       var textArea;
       //uses JS Interpreter createPrimitive method to access the DOM
-      myInterpreter.createPrimitive(textArea = document.getElementById(textAreaID));
+      myInterpreter.createPrimitive(textArea =
+          document.getElementById(textAreaID));
       while (textArea.hasChildNodes()) {
         myInterpreter.createPrimitive(textArea.removeChild(textArea.lastChild));
       }
       return myInterpreter.createPrimitive(textArea);
     };
-    //denotes to the interpreter that upon calls to clearText, it should execute the wrapper function defined.
-    myInterpreter.setProperty(scope, 'clearText', myInterpreter.createNativeFunction(clearTextWrapper));
+    //denotes to the interpreter that upon calls to clearText,
+    //it should execute the wrapper function defined.
+    myInterpreter.setProperty(scope, 'clearText',
+        myInterpreter.createNativeFunction(clearTextWrapper));
 
     /**
      * Wrapper to append text to the given div within JS Interpreter.
@@ -264,16 +274,18 @@ var runCode = function() {
     var speechWrapper = function(wordsToSay, callback) {
       wordsToSay = wordsToSay ? wordsToSay.toString() : '';
       if ('speechSynthesis' in window) {
-        msg.text = wordsToSay;
-        window.speechSynthesis.speak(msg);
+        speech.msg.text = wordsToSay;
+        window.speechSynthesis.speak(speech.msg);
       } else {
-        logMessage("speechSynthesis not found. Text to speech capability under Web Speech API not supported.");
+        speech.logMessage("speechSynthesis not found. Text to speech capability\
+           under Web Speech API not supported.");
       }
-      msg.onend = function(e) {
+      speech.msg.onend = function(e) {
         callback();
       };
     };
-    myInterpreter.setProperty(scope, 'globalSay', myInterpreter.createAsyncFunction(speechWrapper));
+    myInterpreter.setProperty(scope, 'globalSay',
+        myInterpreter.createAsyncFunction(speechWrapper));
 
     /**
      * Wrapper to get voices available for speech synthesis from the window.
@@ -292,7 +304,7 @@ var runCode = function() {
      */
     var setVoiceWrapper = function(newVoiceIndex) {
       //voices is defined in the blocks.js file that defines the set_voice block
-      myInterpreter.createPrimitive(msg.voice = voices[newVoiceIndex]);
+      myInterpreter.createPrimitive(speech.msg.voice = voices[newVoiceIndex]);
     };
     myInterpreter.setProperty(scope, 'setVoice',
         myInterpreter.createNativeFunction(setVoiceWrapper));
@@ -303,7 +315,7 @@ var runCode = function() {
      * @param {number} newVolume - a number n, where 0 <= n <= 1.
      */
     var setVolumeWrapper = function(newVolume) {
-      myInterpreter.createPrimitive(msg.volume = newVolume);
+      myInterpreter.createPrimitive(speech.msg.volume = newVolume);
     };
     myInterpreter.setProperty(scope, 'setVolume',
         myInterpreter.createNativeFunction(setVolumeWrapper));
@@ -314,7 +326,7 @@ var runCode = function() {
      * @param {number} newRate - a number n, where .1 <= n <= 10.
      */
     var setRateWrapper = function(newRate) {
-      myInterpreter.createPrimitive(msg.rate = newRate);
+      myInterpreter.createPrimitive(speech.msg.rate = newRate);
     };
     myInterpreter.setProperty(scope, 'setRate',
         myInterpreter.createNativeFunction(setRateWrapper));
@@ -322,61 +334,66 @@ var runCode = function() {
   //initializes myInterpreter
   var myInterpreter = new Interpreter(code,initFunc);
   //runs myInterpreter
-  runButton(myInterpreter);
+  speech.runButton(myInterpreter);
 };
 
 /**
- * Add a word that the recognizer should be able to recognize from the user. Called from block code.
+ * Add a word that the recognizer should be able to recognize from the user.
+ * Called from block code.
+ *
  * @param {string} word The word to be added to the list of recognizable words.
  */
 
-var addRecognizableWord = function(word) {
-  recognizableWords[recognizableWords.length] = word;
+speech.addRecognizableWord = function(word) {
+  speech.recognizableWords[speech.recognizableWords.length] = word;
 };
 
 /**
- * Uses the recognizableWords to generate a string to give to the recognizer in updateGrammars.
+ * Uses the recognizableWords to generate a string to give to the recognizer in
+ * updateGrammars.
  *
- * @return {string} Returns the grammar string formatted correctly so that it can update the grammar of a
- * recognizer.
+ * @return {String} grammarString - the grammar string formatted correctly
+ * so that it can update the grammar of a recognizer.
  */
-var convertRecognizableWordsToString = function() {
+speech.convertRecognizableWordsToString = function() {
   var grammarString = '#JSGF V1.0; grammar phrase; public <phrase> = ';
-  if (recognizableWords.length > 0) {
-    grammarString += recognizableWords[0];
+  if (speech.recognizableWords.length > 0) {
+    grammarString += speech.recognizableWords[0];
   }
-  for (var i = 1; i < recognizableWords.length; i++) {
-    grammarString += ' | ' + recognizableWords[i];
+  for (var i = 1; i < speech.recognizableWords.length; i++) {
+    grammarString += ' | ' + speech.recognizableWords[i];
   }
   grammarString += ';';
   return grammarString;
 };
 
 /**
- * Takes as an argument the recognizer to update. Sets the settings using the grammar string and sets the
- * language to US English.
- * TODO(edauterman): Should we add more choices for language for possible i18n?
- * @param {Recognizer} myRecognizer The recognizer to be updated.
+ * Takes as an argument the recognizer to update. Sets the settings using the
+ * grammar string and sets the language to US English.
+ *
+ * @return {Recognizer} recognizer with grammar list generated from
+ *    recognizable words.
  */
-
-var updateGrammars = function(myRecognizer) {
-  var grammar = convertRecognizableWordsToString();
-  var speechRecognitionList = new SpeechGrammarList();
+speech.createSpeechRecognizer = function() {
+  var myRecognizer = new speech.SpeechRecognition();
+  var grammar = speech.convertRecognizableWordsToString();
+  var speechRecognitionList = new speech.SpeechGrammarList();
   speechRecognitionList.addFromString(grammar, 1);
   myRecognizer.grammars = speechRecognitionList;
   myRecognizer.lang = 'en-US';
   myRecognizer.interimResults = false;
   myRecognizer.maxAlternatives = 1;
+  return myRecognizer;
 };
 
 /**
- * Given a String, gets rid of punctuation and capitalization--all words are left lowercase and separated
- * by a single space
+ * Given a String, gets rid of punctuation and capitalization--all words are
+ * left lowercase and separated by a single space.
  *
- * @param {String} text input for formatting
- * @return {String} Formatted text
+ * @param {String} text - text input for formatting
+ * @return {String} finalString - formatted text
  */
-var formatText = function (text){
+speech.formatText = function(text){
   var punctuationless = text.replace(/[.,\/#!$%\^&\*;:{}—=\-_`~()]/g," ");
   //replace all spaces with a single space
   var finalString = punctuationless.replace(/\s\s+/g, ' ');
