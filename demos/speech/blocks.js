@@ -9,16 +9,14 @@ Blockly.Blocks['listen_if'] = {
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour(0);
-    this.setTooltip('');
-    this.setHelpUrl('http://www.example.com/');
   }
 };
 
 Blockly.JavaScript['listen_if'] = function(block) {
-    var text_word = Blockly.JavaScript.valueToCode(block, 'WORD', Blockly.JavaScript.ORDER_ATOMIC);
-    var statements_do = Blockly.JavaScript.statementToCode(block, 'DO');
-    addRecognizableWord(text_word);
-    return 'if (listen_branch('+formatText(text_word)+')) {\n' + statements_do + '}\n';
+  var text_word = Blockly.JavaScript.valueToCode(block, 'WORD', Blockly.JavaScript.ORDER_ATOMIC);
+  var statements_do = Blockly.JavaScript.statementToCode(block, 'DO');
+  addRecognizableWord(text_word);
+  return 'if (listen_branch('+formatText(text_word)+')) {\n' + statements_do + '}\n';
 };
 
 //listen_bool returns a boolean value, true if the user says a specified word and false otherwise
@@ -29,17 +27,15 @@ Blockly.Blocks['listen_bool'] = {
         .appendField("you say");
     this.setOutput(true, null);
     this.setColour(0);
-    this.setTooltip('');
-    this.setHelpUrl('http://www.example.com/');
   }
 };
 
 Blockly.JavaScript['listen_bool'] = function(block) {
-    var text_word = Blockly.JavaScript.valueToCode(block, 'WORD', Blockly.JavaScript.ORDER_ATOMIC);
-    addRecognizableWord(text_word);
-    window.console.log(text_word + " "+ formatText(text_word));
-    var code = 'listen_branch('+formatText(text_word)+')';
-    return [code, Blockly.JavaScript.ORDER_ATOMIC];
+  var text_word = Blockly.JavaScript.valueToCode(block, 'WORD', Blockly.JavaScript.ORDER_ATOMIC);
+  addRecognizableWord(text_word);
+  window.console.log(text_word + " "+ formatText(text_word));
+  var code = 'listen_branch('+formatText(text_word)+')';
+  return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
 //listen_text returns a String containing what the user said
@@ -49,8 +45,6 @@ Blockly.Blocks['listen_text'] = {
         .appendField("what you say");
     this.setOutput(true, "String");
     this.setColour(0);
-    this.setTooltip('');
-    this.setHelpUrl('http://www.example.com/');
   }
 };
 
@@ -68,8 +62,6 @@ Blockly.Blocks['display_img'] = {
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour(60);
-    this.setTooltip('');
-    this.setHelpUrl('http://www.example.com/');
   }
 };
 
@@ -90,8 +82,6 @@ Blockly.Blocks['display_pause'] = {
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour(60);
-    this.setTooltip('');
-    this.setHelpUrl('http://www.example.com/');
   }
 };
 
@@ -114,8 +104,6 @@ Blockly.Blocks['display_update_text'] = {
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour(60);
-    this.setTooltip('');
-    this.setHelpUrl('http://www.example.com/');
   }
 };
 
@@ -138,12 +126,10 @@ Blockly.Blocks['display_clear_text'] = {
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour(60);
-    this.setTooltip('');
-    this.setHelpUrl('http://www.example.com/');
   }
 };
 
-Blockly.JavaScript['display_clear_text'] = function(block) {
+Blockly.JavaScript['display_clear_text'] = function() {
   var code = 'clearText("textArea");\n';
   return code;
 };
@@ -157,8 +143,6 @@ Blockly.Blocks['speech_speak'] = {
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour(30);
-    this.setTooltip('');
-    this.setHelpUrl('http://www.example.com/');
   }
 };
 
@@ -167,7 +151,7 @@ Blockly.JavaScript['speech_speak'] = function(block) {
   var code;
   if (value_to_say !== '' && value_to_say !== null){
     code = 'globalSay(' + value_to_say + ');\n';
-  }  
+  }
   else{
     code = '\n';
   }
@@ -175,55 +159,58 @@ Blockly.JavaScript['speech_speak'] = function(block) {
 };
 
 /** helper function for the 'speech_set_voice' block;
- * @param {!Array.<SpeechSynthesisVoice>} the available voices
- * @return {!Array.<!Array.<string>>} the dropdown options 
+ *
+ * @param {!Array.<SpeechSynthesisVoice>} voices - the available voices
+ * @return {!Array.<!Array.<string>>} dropdown - the dropdown options
  */
 var getVoicesForBlock = function(voices){
   var dropdown = [];
+  var i;
   for (i = 0; i < voices.length; i++){
     var voice = [voices[i].name, i.toString()];
     dropdown.push(voice);
-  };
+  }
   return dropdown;
-}
-
-
-/** the voice list is loaded async to the page. An onvoiceschanged event is fired when they are loaded.
- *  http://stackoverflow.com/questions/21513706/getting-the-list-of-voices-in-speechsynthesis-of-chrome-web-speech-api
- */
-var voices; 
- // wait on voices to be loaded before fetching list
-window.speechSynthesis.onvoiceschanged = function(){
-    //voices becomes {!Array.<SpeechSynthesisVoice>}
-    voices = window.speechSynthesis.getVoices();
-    Blockly.Blocks['speech_set_voice'] = {
-      init: function() {
-        this.appendDummyInput()
-            .appendField("set voice to")
-            .appendField(new Blockly.FieldDropdown(getVoicesForBlock(voices)), "VOICES");
-        this.setPreviousStatement(true, null);
-        this.setNextStatement(true, null);
-        this.setColour(30);
-        this.setTooltip('');
-        this.setHelpUrl('http://www.example.com/');
-      }
-    };
 };
 
+
+/** the voice list is loaded async to the page in Chrome. An onvoiceschanged
+ * event is fired when they are loaded.
+ * http://stackoverflow.com/questions/21513706/getting-the-list-of-voices-in-speechsynthesis-of-chrome-web-speech-api
+ */
+var voices = window.speechSynthesis.getVoices();
+var setVoiceBlock = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("set voice to")
+        .appendField(
+          new Blockly.FieldDropdown(getVoicesForBlock(voices)), "VOICES");
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(30);
+  }
+};
+if (voices.length > 0){
+  Blockly.Blocks['speech_set_voice'] = setVoiceBlock;
+} else {
+   // Wait on voices to be loaded before fetching list
+  window.speechSynthesis.onvoiceschanged = function(){
+    //Voices becomes {!Array.<SpeechSynthesisVoice>}
+    voices = window.speechSynthesis.getVoices();
+    Blockly.Blocks['speech_set_voice'] = setVoiceBlock;
+  };
+}
 //set voice based on user's dropdown choice
-//default is Alex
+
 Blockly.JavaScript['speech_set_voice'] = function(block) {
   var dropdown_name = block.getFieldValue('VOICES');
   // var newVoice = voices[parseInt(dropdown_name)];
   var voiceIndex = parseInt(dropdown_name);
-  var code = 'voices = getVoices();\n\
-    var voiceIndex = ' + voiceIndex + ';\n\
-    var newVoice = voices[voiceIndex];\n\
-    setVoice(voiceIndex);';
+  var code = 'setVoice(' + voiceIndex + ');\n';
   return code;
 };
 
-//set volume of speech
+// Set volume of speech
 Blockly.Blocks['speech_set_volume'] = {
   init: function() {
     this.appendValueInput("VOLUME")
@@ -232,20 +219,20 @@ Blockly.Blocks['speech_set_volume'] = {
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour(30);
-    this.setTooltip('');
-    this.setHelpUrl('http://www.example.com/');
   }
 };
 
 Blockly.JavaScript['speech_set_volume'] = function(block) {
-  var value_volume = Blockly.JavaScript.valueToCode(block, 'VOLUME', Blockly.JavaScript.ORDER_ATOMIC);
+  var value_volume = Blockly.JavaScript.valueToCode(
+    block, 'VOLUME', Blockly.JavaScript.ORDER_ATOMIC);
   var code = '';
-  if (value_volume >= 0 && value_volume <= 1)
+  if (value_volume >= 0 && value_volume <= 1){
     code = 'setVolume('+ value_volume+');\n';
+  }
   return code;
 };
 
-//set rate of speech
+// Set rate of speech
 Blockly.Blocks['speech_set_rate'] = {
   init: function() {
     this.appendValueInput("RATE")
@@ -254,19 +241,20 @@ Blockly.Blocks['speech_set_rate'] = {
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour(30);
-    this.setTooltip('');
-    this.setHelpUrl('http://www.example.com/');
   }
 };
 
 Blockly.JavaScript['speech_set_rate'] = function(block) {
-  var value_rate = Blockly.JavaScript.valueToCode(block, 'RATE', Blockly.JavaScript.ORDER_ATOMIC);
+  var value_rate = Blockly.JavaScript.valueToCode(
+    block, 'RATE', Blockly.JavaScript.ORDER_ATOMIC);
   var code = '';
-  if (value_rate >= .1 && value_rate <= 10)
+  if (value_rate >= .1 && value_rate <= 10){
     code = 'setRate('+ value_rate+');\n';
+  }
   return code;
 };
 
+var opt = [["replacing old text", "REPLACE"], ["adding to old text", "APPEND"]];
 Blockly.Blocks['speech_say_and_write'] = {
   init: function() {
     this.appendValueInput("TEXT")
@@ -274,19 +262,19 @@ Blockly.Blocks['speech_say_and_write'] = {
         .appendField("say and write");
     this.appendDummyInput()
         .appendField("by")
-        .appendField(new Blockly.FieldDropdown([["replacing old text", "REPLACE"], ["adding to old text", "APPEND"]]), "WRITE_TYPE");
+        .appendField(new Blockly.FieldDropdown(opt), "WRITE_TYPE");
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour(30);
-    this.setTooltip('');
-    this.setHelpUrl('http://www.example.com/');
   }
 };
 
 Blockly.JavaScript['speech_say_and_write'] = function(block) {
-  var value_update_text = Blockly.JavaScript.valueToCode(block, 'TEXT', Blockly.JavaScript.ORDER_ATOMIC);
+  var value_update_text = Blockly.JavaScript.valueToCode(
+    block, 'TEXT', Blockly.JavaScript.ORDER_ATOMIC);
   var dropdown_write_type = block.getFieldValue('WRITE_TYPE');
-    var code = 'if(' + Blockly.JavaScript.quote_(dropdown_write_type) + ' == "REPLACE"){\n\
+  var code = 'if(' + Blockly.JavaScript.quote_(dropdown_write_type) + ' ==\
+     "REPLACE"){\n\
       clearText("textArea");\n\
     }\n\
     appendText("p", '+ value_update_text + ',"textArea");\n\
