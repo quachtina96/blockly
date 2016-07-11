@@ -211,7 +211,7 @@ speech.runCode = function() {
      * Wrapper to clear the textArea div.
      *
      * @param {String} textAreaID - id attribute of textAreaID
-     * @return {Element} textArea - HTML div element that is the textArea
+     * @return {Element} HTML div element that is the textArea
      */
     var clearTextWrapper = function(textAreaID) {
       //convert from JS Interpreter primitive to standard JavaScript String
@@ -237,7 +237,7 @@ speech.runCode = function() {
      *    encapsulate text e.g. "p" or "h3"
      * @param {String} text - text to append to the text area
      * @param {String} textAreaID - id of text area div to which we append text
-     * @return {Element} textArea - HTML textArea div
+     * @return {Element} HTML textArea div
      */
     var appendTextWrapper = function(elementType, text, textAreaID) {
       text = text ? text.toString() : '';
@@ -352,7 +352,7 @@ speech.addRecognizableWord = function(word) {
  * Uses the recognizableWords to generate a string to give to the recognizer in
  * updateGrammars.
  *
- * @return {String} grammarString - the grammar string formatted correctly
+ * @return {String} the grammar string formatted correctly
  * so that it can update the grammar of a recognizer.
  */
 speech.convertRecognizableWordsToString = function() {
@@ -391,7 +391,7 @@ speech.createSpeechRecognizer = function() {
  * left lowercase and separated by a single space.
  *
  * @param {String} text - text input for formatting
- * @return {String} finalString - formatted text
+ * @return {String} formatted text
  */
 speech.formatText = function(text){
   var punctuationless = text.replace(/[.,\/#!$%\^&\*;:{}—=\-_`~()]/g," ");
