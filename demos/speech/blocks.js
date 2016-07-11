@@ -201,15 +201,12 @@ if (voices.length > 0){
   };
 }
 //set voice based on user's dropdown choice
-//default is Alex
+
 Blockly.JavaScript['speech_set_voice'] = function(block) {
   var dropdown_name = block.getFieldValue('VOICES');
   // var newVoice = voices[parseInt(dropdown_name)];
   var voiceIndex = parseInt(dropdown_name);
-  var code = 'voices = getVoices();\n\
-    var voiceIndex = ' + voiceIndex + ';\n\
-    var newVoice = voices[voiceIndex];\n\
-    setVoice(voiceIndex);';
+  var code = 'setVoice(' + voiceIndex + ');\n';
   return code;
 };
 
