@@ -25,14 +25,14 @@
       <td width="50%" height="5%">
         <table>
           <tr id="blockLibrary">
-            <td style="vertical-align: bottom;">
+            <td id="blockLibraryContainer">
             <span>
               <h3>Block Library:</h3>
               <select id="blockLibraryDropdown" onChange="BlockLibrary.selectHandler(this);">
               </select>
             </span>
             </td>
-            <td style="vertical-align: middle; text-align: right;">
+            <td id="blockLibraryControls">
             <button id="saveToBlockLibraryButton" title="Save block xml to a local file.">
               <span>Save to Block Library</span>
             </button>
@@ -45,7 +45,7 @@
             </td>
           </tr>
           <tr>
-            <td style="vertical-align: bottom;">
+            <td id="previewContainer">
               <h3>Preview:
                 <select id="direction">
                   <option value="ltr">LTR</option>
@@ -53,16 +53,18 @@
                 </select>
               </h3>
             </td>
-            <td style="vertical-align: middle; text-align: right;">
+            <td id="buttonContainer">
               <button id="linkButton" title="Save and link to blocks.">
                 <img src="link.png" height="21" width="21">
               </button>
               <button id="linkButton" title="Save and link to blocks.">
                 <img src="link.png" height="21" width="21">
               </button>
-              <label for="files" class="buttonStyle"> <span class=>Import block</span></label>
-              <input style="visibility: hidden; position: absolute;" id="files"  type="file"
-                     name="files" accept="application/xml">
+              <label for="files" class="buttonStyle">
+                <span class=>Import block</span>
+              </label>
+              <input id="files"  type="file" name="files"
+                  accept="application/xml">
               <button id="localSaveButton" title="Save block xml to a local file.">
                 <span>Download block</span>
               </button>
@@ -75,7 +77,7 @@
       </td>
     </tr>
     <tr>
-      <td width="50%" height="95%" style="padding: 2px;">
+      <td id="blocklyWorkspaceContainer">
         <div id="blockly"></div>
         <div id="blocklyMask"></div>
       </td>
@@ -132,7 +134,7 @@
         </table>
       </td>
   </table>
-  <xml id="toolbox" style="display: none">
+  <xml id="toolbox">
     <category name="Input">
       <block type="input_value">
         <value name="TYPE">

@@ -93,3 +93,37 @@ button, .buttonStyle {
 #linkButton {
   display: none;
 }
+
+#blockLibraryContainer {
+   vertical-align: bottom;
+}
+
+#blockLibraryControls {
+  vertical-align: middle;
+  text-align: right;
+}
+
+#previewContainer {
+  vertical-align: bottom;
+}
+
+#buttonContainer {
+  vertical-align: middle;
+  text-align: right;
+}
+
+#files {
+  visibility: hidden;
+  position: absolute;
+}
+
+#toolbox {
+  display: none;
+}
+
+#blocklyWorkspaceContainer {
+  padding: 2px;
+  width: 50%;
+  height: 95%;
+}
+
