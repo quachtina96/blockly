@@ -1087,6 +1087,9 @@ function init() {
   document.getElementById('removeBlockFromLibraryButton')
     .addEventListener('click', BlockLibrary.removeFromBlockLibrary);
 
+  document.getElementById('downloadFromLibButton')
+    .addEventListener('click', BlockLibrary.downloadBlockFiles);
+
   document.getElementById('files').addEventListener('change',
     function() {
       importBlockFromFile();
