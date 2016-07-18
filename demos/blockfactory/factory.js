@@ -1031,8 +1031,6 @@ BlockLibrary.isInBlockLibrary = function(blockType) {
   return (blockType in blockLibrary && blockLibrary[blockType] != null);
 };
 
-
-
 /**
  * Loads block library from local storage and populates the dropdown menu.
  */
@@ -1050,6 +1048,87 @@ BlockLibrary.populateBlockLibrary = function() {
       BlockLibrary.UI.addOption(block, block, 'blockLibraryDropdown');
     }
   }
+};
+
+/**
+* namespace for Block Library Export
+* @namespace Export
+*/
+BlockLibrary.Export = {};
+
+/**
+ * Starts download(s) for the user based on preferences.
+ *
+ */
+BlockLibrary.downloadBlockFiles = function(blockTypes, definitionFormat,
+    generatorLang){
+  //TODO(quacht): implement!
+  //@anyone reading this, this function is
+};
+
+/**
+ * Pulls up a menu for user to customize which blocks and what type of scripts
+ * to download, and what to name the file. Downloads upon submit.
+ */
+ BlockLibrary.UI.loadDownloadMenu = function() {
+  //TODO(quacht)
+ };
+
+/**
+ * Return the given language code of each block type in an array.
+ *
+ * @param {string[]} blockTypes - array of block types for which to get block
+ * definitions
+ * @param {string} definitionFormat - 'JSON' or 'JavaScript'
+ * @return {string} in the desired format, the concatenation of each block's
+ * language code.
+ */
+BlockLibrary.Export.getBlockDefs = function(blockTypes, definitionFormat) {
+  var rootBlock = getRootBlock();
+  var blockCode = [];
+  for (var i = 0; i < blockTypes.length; i++) {
+    var blockType = blockTypes[i];
+    blockType = blockType.replace(/\W/g, '_').replace(/^(\d)/, '_\\1');
+    switch (definitionFormat) {
+      case 'JSON':
+        var code = formatJson_(blockType, rootBlock);
+        break;
+      case 'JavaScript':
+        var code = formatJavaScript_(blockType, rootBlock);
+        break;
+    }
+    blockCode.push(code);
+  }
+  return blockCode.join("\n\n");
+};
+
+/**
+ * Return the generator code of each block type in an array in a given language.
+ *
+ * @param {string[]} blockTypes - array of block types for which to get block
+ * definitions
+ * @param {string} generatorLanguage - e.g.'JavaScript', 'Python', 'PHP', 'Lua',
+ *     'Dart'
+ * @return {string} in the desired format, the concatenation of each block's
+ * generator code.
+ */
+BlockLibrary.Export.getGeneratorCode = function(blockTypes, generatorLanguage) {
+  var rootBlock = getRootBlock();
+  var blockCode = [];
+  for (var i = 0; i < blockTypes.length; i++) {
+    var blockType = blockTypes[i];
+    blockType = blockType.replace(/\W/g, '_').replace(/^(\d)/, '_\\1');
+    switch (definitionFormat) {
+      case 'JSON':
+        var code = formatJson_(blockType, rootBlock);
+        break;
+      case 'JavaScript':
+        var code = formatJavaScript_(blockType, rootBlock);
+        break;
+    }
+    blockCode.push(code);
+  }
+  return blockCode.join("\n\n");
 };
 
 /**
