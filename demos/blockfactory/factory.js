@@ -1072,24 +1072,6 @@ BlockLibrary.Export.mainWorkspace = null;
 BlockLibrary.Export.previewWorkspace = null;
 
 /**
- * Starts download(s) for the user based on preferences.
- *
- */
-BlockLibrary.downloadBlockFiles = function(blockTypes, definitionFormat,
-    generatorLang){
-  //TODO(quacht): implement!
-  //@anyone reading this, this function is
-};
-
-/**
- * Pulls up a menu for user to customize which blocks and what type of scripts
- * to download, and what to name the file. Downloads upon submit.
- */
- BlockLibrary.UI.loadDownloadMenu = function() {
-  //TODO(quacht)
- };
-
-/**
  * Return the given language code of each block type in an array.
  *
  * @param {string[]} blockTypes - array of block types for which to get block
@@ -1135,7 +1117,6 @@ BlockLibrary.Export.getGeneratorCode = function(blockTypes, generatorLanguage) {
   // Define the custom blocks so we can create instances of them in the
   // exporter workspace
   var blockDefs = BlockLibrary.Export.getBlockDefs(blockTypes, 'JavaScript');
-  alert(blockDefs);
   eval(blockDefs);
   for (var i = 0; i < blockTypes.length; i++) {
     var blockType = blockTypes[i];
@@ -1146,7 +1127,6 @@ BlockLibrary.Export.getGeneratorCode = function(blockTypes, generatorLanguage) {
     tempBlock.setMovable(false);
     tempBlock.setDeletable(false);
     tempBlock.moveBy(15, 10);
-    console.log(tempBlock);
     BlockLibrary.Export.previewWorkspace.clearUndo();
     var blockGenCode = BlockLibrary.Export.updateGenerator(tempBlock, generatorLanguage);
     multiblockCode.push(blockGenCode);
@@ -1154,14 +1134,13 @@ BlockLibrary.Export.getGeneratorCode = function(blockTypes, generatorLanguage) {
   return multiblockCode.join("\n\n");
 };
 
-
 /**
  * Get the generator code for a given block.
  *
  * @param {!Blockly.Block} block - Rendered block in preview workspace.
  * @param {string} generatorLanguage - e.g.'JavaScript', 'Python', 'PHP', 'Lua',
  *     'Dart'
- * @return {string} multiblock generator code
+ * @return {string} generator code for multiple blocks.
  */
 BlockLibrary.Export.updateGenerator = function(block, generatorLanguage){
   function makeVar(root, name) {
@@ -1242,21 +1221,6 @@ BlockLibrary.Export.updateGenerator = function(block, generatorLanguage){
 
   return code.join('\n');
 };
-
-function generate(xmlText) {
-  // Parse the XML into a tree.
-  try {
-    var xml = Blockly.Xml.textToDom(xmlText)
-  } catch (e) {
-    alert(e);
-    return;
-  }
-  // Create a headless workspace.
-  var workspace = new Blockly.Workspace();
-  Blockly.Xml.domToWorkspace(xml, workspace);
-  var code = Blockly.JavaScript.workspaceToCode(workspace);
-  alert(code);
-}
 
 /**
  * Initialize Blockly and layout.  Called on page load.
