@@ -1121,23 +1121,6 @@ BlockLibrary.Export.getBlockDefs = function(blockTypes, definitionFormat) {
 };
 
 /**
- * Object representing a block to be stored into Block Library.
- * @constructor
- *
- * @param {!Blockly.Workspace} mainWorkspace - workspace for making the block
- * @param {!Blockly.Workspace} previewWorkspace - workspace containing preview
- * block
- */
-BlockLibrary.BlockStore = function(mainWorkspace, previewWorkspace) {
-  var blockXML = Blockly.Xml.workspaceToDom(mainWorkspace);
-  var currentBlock = previewWorkspace.getTopBlocks()[0];
-  this.type = currentBlock.type;
-  this.xmlText = Blockly.Xml.domToPrettyText(blockXML);
-  this.inputList = currentBlock.inputList;
-  this.outputConnection = currentBlock.outputConnection ? true : false;
-};
-
-/**
  * Return the generator code of each block type in an array in a given language.
  *
  * @param {string[]} blockTypes - array of block types for which to get block
@@ -1156,6 +1139,7 @@ BlockLibrary.Export.getGeneratorCode = function(blockTypes, generatorLanguage) {
   eval(blockDefs);
   for (var i = 0; i < blockTypes.length; i++) {
     var blockType = blockTypes[i];
+    BlockLibrary.Export.previewWorkspace.clear();
     var tempBlock = BlockLibrary.Export.previewWorkspace.newBlock(blockType);
     tempBlock.initSvg();
     tempBlock.render();
@@ -1363,7 +1347,6 @@ function init() {
   BlockLibrary.Export.mainWorkspace = Blockly.inject('exporterMain',
       {media: '../../media/',
       scrollbars: true});
-  // TODO(quacht): move into Export workspace
   BlockLibrary.Export.previewWorkspace = Blockly.inject('exporterPreview',
       {media: '../../media/',
       scrollbars: true});
