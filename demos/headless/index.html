@@ -6,7 +6,6 @@
   <script src="../../blockly_compressed.js"></script>
   <script src="../../blocks_compressed.js"></script>
   <script src="../../python_compressed.js"></script>
-  <script src="../../javascript_compressed.js"></script>
   <script src="../../msg/js/en.js"></script>
   <style>
     body {
@@ -112,7 +111,7 @@
       // Create a headless workspace.
       var workspace = new Blockly.Workspace();
       Blockly.Xml.domToWorkspace(xml, workspace);
-      var code = Blockly.Javascript.workspaceToCode(workspace);
+      var code = Blockly.Python.workspaceToCode(workspace);
       document.getElementById('code_output').value = code;
     }
   </script>
