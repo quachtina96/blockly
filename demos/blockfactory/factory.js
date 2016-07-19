@@ -1281,7 +1281,7 @@ function init() {
 
   document.getElementById('downloadGenerator').addEventListener('click',
     function() {
-      downloadTextArea('generator', 'generatorPre')
+      downloadTextArea('generator', 'generatorPre');
     });
 
   var expandList = [
