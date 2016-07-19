@@ -7,16 +7,21 @@
   <meta name="viewport" content="target-densitydpi=device-dpi, height=660, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Blockly Demo: Block Factory</title>
   <script src="/storage.js"></script>
+  <script src="../../blockly_uncompressed.js"></script>
+  <script src="../../generators/javascript.js"></script>
   <script src="factory.js"></script>
-  <script src="../../blockly_compressed.js"></script>
-  <script src="../../msg/messages.js"></script>
   <script src="blocks.js"></script>
   <link rel="stylesheet" href="factory.css">
   <link rel="stylesheet" href="../prettify.css">
   <script src="../prettify.js"></script>
 </head>
 <body>
-  <table>
+<!-- style="display: none" -->
+<!--   <div id="exporterMain" style="display: none"></div>
+  <div id="exporterPreview" style="display: none"></div> -->
+   <div id="exporterMain"></div>
+  <div id="exporterPreview"></div>
+ <table>
     <tr>
       <td width="50%" height="5%">
         <h1><a href="https://developers.google.com/blockly/">Blockly</a> &gt;

@@ -31,7 +31,7 @@ var mainWorkspace = null;
 
 /**
  * Workspace for preview of block.
- * @type {Blockly.Workspace}
+ * @type
  */
 var previewWorkspace = null;
 
@@ -69,7 +69,7 @@ function formatChange() {
  * Update the language code based on constructs made in Blockly.
  */
 function updateLanguage() {
-  var rootBlock = getRootBlock();
+  var rootBlock = getRootBlock(mainWorkspace);
   if (!rootBlock) {
     return;
   }
@@ -279,7 +279,7 @@ function formatJavaScript_(blockType, rootBlock) {
  * @private
  */
 function connectionLineJs_(functionName, typeName) {
-  var type = getOptTypesFrom(getRootBlock(), typeName);
+  var type = getOptTypesFrom(getRootBlock(mainWorkspace), typeName);
   if (type) {
     type = ', ' + type;
   } else {
@@ -688,7 +688,6 @@ function updatePreview() {
     previewBlock.setDeletable(false);
     previewBlock.moveBy(15, 10);
     previewWorkspace.clearUndo();
-
     updateGenerator(previewBlock);
   } finally {
     Blockly.Blocks = backupBlocks;
@@ -710,11 +709,14 @@ function injectCode(code, id) {
 }
 
 /**
- * Return the uneditable container block that everything else attaches to.
+ * Return the uneditable container block that everything else attaches to in
+ * given workspace
+ *
+ * @param {!Blockly.Workspace} workspace - where the root block lives
  * @return {Blockly.Block}
  */
-function getRootBlock() {
-  var blocks = mainWorkspace.getTopBlocks(false);
+function getRootBlock(workspace) {
+  var blocks = workspace.getTopBlocks(false);
   for (var i = 0, block; block = blocks[i]; i++) {
     if (block.type == 'factory_base') {
       return block;
@@ -722,6 +724,7 @@ function getRootBlock() {
   }
   return null;
 }
+
 /**
  * Generate a file from the contents of a given text area and
  * download that file.
@@ -906,7 +909,7 @@ BlockLibrary.Storage.prototype.clear = function() {
 /**
  * Saves block to block library.
  *
- * @param {string} blockType - the type the block
+ * @param {string} blockType - name of block
  * @param {Element} blockXML - the block's XML pulled from workspace
  */
 BlockLibrary.Storage.prototype.addBlock = function(blockType, blockXML) {
@@ -917,7 +920,7 @@ BlockLibrary.Storage.prototype.addBlock = function(blockType, blockXML) {
 /**
  * Removes block from current block library (this.blocks).
  *
- * @param {string} blockType - type of block
+ * @param {string} blockType - name of block
  */
 BlockLibrary.Storage.prototype.removeBlock = function(blockType) {
   this.blocks[blockType] = null;
@@ -961,7 +964,7 @@ BlockLibrary.Storage.prototype.isEmpty = function() {
  * @return {string} the current block's type
  */
 BlockLibrary.getCurrentBlockType = function() {
-  var rootBlock = getRootBlock();
+  var rootBlock = getRootBlock(mainWorkspace);
   return rootBlock.getFieldValue('NAME').trim().toLowerCase();
 };
 
@@ -1012,7 +1015,6 @@ BlockLibrary.saveToBlockLibrary = function() {
     alert('You already have a block called ' + blockType + ' in your library.' +
       ' Please rename your block or delete the old one.');
   } else {
-    var blockType = BlockLibrary.getCurrentBlockType();
     var xmlElement = Blockly.Xml.workspaceToDom(mainWorkspace);
     BlockLibrary.storage.addBlock(blockType, xmlElement);
     BlockLibrary.storage.saveToLocalStorage();
@@ -1057,6 +1059,19 @@ BlockLibrary.populateBlockLibrary = function() {
 BlockLibrary.Export = {};
 
 /**
+ * Hidden workspace for the Block Library Exporter that holds pieces that make
+ * up the block
+ * @type
+ */
+BlockLibrary.Export.mainWorkspace = null;
+
+/**
+ * Hidden workspace for the Block Library Exporter that holds preview of block
+ * @type
+ */
+BlockLibrary.Export.previewWorkspace = null;
+
+/**
  * Starts download(s) for the user based on preferences.
  *
  */
@@ -1084,10 +1099,13 @@ BlockLibrary.downloadBlockFiles = function(blockTypes, definitionFormat,
  * language code.
  */
 BlockLibrary.Export.getBlockDefs = function(blockTypes, definitionFormat) {
-  var rootBlock = getRootBlock();
   var blockCode = [];
   for (var i = 0; i < blockTypes.length; i++) {
     var blockType = blockTypes[i];
+    var xml = BlockLibrary.storage.getBlockXML(blockType);
+    BlockLibrary.Export.mainWorkspace.clear();
+    Blockly.Xml.domToWorkspace(xml, BlockLibrary.Export.mainWorkspace);
+    var rootBlock = getRootBlock(BlockLibrary.Export.mainWorkspace);
     blockType = blockType.replace(/\W/g, '_').replace(/^(\d)/, '_\\1');
     switch (definitionFormat) {
       case 'JSON':
@@ -1103,6 +1121,23 @@ BlockLibrary.Export.getBlockDefs = function(blockTypes, definitionFormat) {
 };
 
 /**
+ * Object representing a block to be stored into Block Library.
+ * @constructor
+ *
+ * @param {!Blockly.Workspace} mainWorkspace - workspace for making the block
+ * @param {!Blockly.Workspace} previewWorkspace - workspace containing preview
+ * block
+ */
+BlockLibrary.BlockStore = function(mainWorkspace, previewWorkspace) {
+  var blockXML = Blockly.Xml.workspaceToDom(mainWorkspace);
+  var currentBlock = previewWorkspace.getTopBlocks()[0];
+  this.type = currentBlock.type;
+  this.xmlText = Blockly.Xml.domToPrettyText(blockXML);
+  this.inputList = currentBlock.inputList;
+  this.outputConnection = currentBlock.outputConnection ? true : false;
+};
+
+/**
  * Return the generator code of each block type in an array in a given language.
  *
  * @param {string[]} blockTypes - array of block types for which to get block
@@ -1113,23 +1148,131 @@ BlockLibrary.Export.getBlockDefs = function(blockTypes, definitionFormat) {
  * generator code.
  */
 BlockLibrary.Export.getGeneratorCode = function(blockTypes, generatorLanguage) {
-  var rootBlock = getRootBlock();
-  var blockCode = [];
+  var multiblockCode = [];
+  // Define the custom blocks so we can create instances of them in the
+  // exporter workspace
+  var blockDefs = BlockLibrary.Export.getBlockDefs(blockTypes, 'JavaScript');
+  alert(blockDefs);
+  eval(blockDefs);
   for (var i = 0; i < blockTypes.length; i++) {
     var blockType = blockTypes[i];
-    blockType = blockType.replace(/\W/g, '_').replace(/^(\d)/, '_\\1');
-    switch (definitionFormat) {
-      case 'JSON':
-        var code = formatJson_(blockType, rootBlock);
-        break;
-      case 'JavaScript':
-        var code = formatJavaScript_(blockType, rootBlock);
-        break;
-    }
-    blockCode.push(code);
+    var tempBlock = BlockLibrary.Export.previewWorkspace.newBlock(blockType);
+    tempBlock.initSvg();
+    tempBlock.render();
+    tempBlock.setMovable(false);
+    tempBlock.setDeletable(false);
+    tempBlock.moveBy(15, 10);
+    console.log(tempBlock);
+    BlockLibrary.Export.previewWorkspace.clearUndo();
+    var blockGenCode = BlockLibrary.Export.updateGenerator(tempBlock, generatorLanguage);
+    multiblockCode.push(blockGenCode);
   }
-  return blockCode.join("\n\n");
+  return multiblockCode.join("\n\n");
 };
+
+
+/**
+ * Get the generator code for a given block.
+ *
+ * @param {!Blockly.Block} block - Rendered block in preview workspace.
+ * @param {string} generatorLanguage - e.g.'JavaScript', 'Python', 'PHP', 'Lua',
+ *     'Dart'
+ * @return {string} multiblock generator code
+ */
+BlockLibrary.Export.updateGenerator = function(block, generatorLanguage){
+  function makeVar(root, name) {
+    name = name.toLowerCase().replace(/\W/g, '_');
+    return '  var ' + root + '_' + name;
+  }
+  // The makevar function lives in the original update generator.
+  var language = generatorLanguage;
+  var code = [];
+  code.push("Blockly." + language + "['" + block.type +
+            "'] = function(block) {");
+
+  // Generate getters for any fields or inputs.
+  for (var i = 0, input; input = block.inputList[i]; i++) {
+    for (var j = 0, field; field = input.fieldRow[j]; j++) {
+      var name = field.name;
+      if (!name) {
+        continue;
+      }
+      if (field instanceof Blockly.FieldVariable) {
+        // Subclass of Blockly.FieldDropdown, must test first.
+        code.push(makeVar('variable', name) +
+                  " = Blockly." + language +
+                  ".variableDB_.getName(block.getFieldValue('" + name +
+                  "'), Blockly.Variables.NAME_TYPE);");
+      } else if (field instanceof Blockly.FieldAngle) {
+        // Subclass of Blockly.FieldTextInput, must test first.
+        code.push(makeVar('angle', name) +
+                  " = block.getFieldValue('" + name + "');");
+      } else if (Blockly.FieldDate && field instanceof Blockly.FieldDate) {
+        // Blockly.FieldDate may not be compiled into Blockly.
+        code.push(makeVar('date', name) +
+                  " = block.getFieldValue('" + name + "');");
+      } else if (field instanceof Blockly.FieldColour) {
+        code.push(makeVar('colour', name) +
+                  " = block.getFieldValue('" + name + "');");
+      } else if (field instanceof Blockly.FieldCheckbox) {
+        code.push(makeVar('checkbox', name) +
+                  " = block.getFieldValue('" + name + "') == 'TRUE';");
+      } else if (field instanceof Blockly.FieldDropdown) {
+        code.push(makeVar('dropdown', name) +
+                  " = block.getFieldValue('" + name + "');");
+      } else if (field instanceof Blockly.FieldTextInput) {
+        code.push(makeVar('text', name) +
+                  " = block.getFieldValue('" + name + "');");
+      }
+    }
+    var name = input.name;
+    if (name) {
+      if (input.type == Blockly.INPUT_VALUE) {
+        code.push(makeVar('value', name) +
+                  " = Blockly." + language + ".valueToCode(block, '" + name +
+                  "', Blockly." + language + ".ORDER_ATOMIC);");
+      } else if (input.type == Blockly.NEXT_STATEMENT) {
+        code.push(makeVar('statements', name) +
+                  " = Blockly." + language + ".statementToCode(block, '" +
+                  name + "');");
+      }
+    }
+  }
+  // Most languages end lines with a semicolon.  Python does not.
+  var lineEnd = {
+    'JavaScript': ';',
+    'Python': '',
+    'PHP': ';',
+    'Dart': ';'
+  };
+  code.push("  // TODO: Assemble " + language + " into code variable.");
+  if (block.outputConnection) {
+    code.push("  var code = '...';");
+    code.push("  // TODO: Change ORDER_NONE to the correct strength.");
+    code.push("  return [code, Blockly." + language + ".ORDER_NONE];");
+  } else {
+    code.push("  var code = '..." + (lineEnd[language] || '') + "\\n';");
+    code.push("  return code;");
+  }
+  code.push("};");
+
+  return code.join('\n');
+};
+
+function generate(xmlText) {
+  // Parse the XML into a tree.
+  try {
+    var xml = Blockly.Xml.textToDom(xmlText)
+  } catch (e) {
+    alert(e);
+    return;
+  }
+  // Create a headless workspace.
+  var workspace = new Blockly.Workspace();
+  Blockly.Xml.domToWorkspace(xml, workspace);
+  var code = Blockly.JavaScript.workspaceToCode(workspace);
+  alert(code);
+}
 
 /**
  * Initialize Blockly and layout.  Called on page load.
@@ -1215,6 +1358,15 @@ function init() {
       {collapse: false,
        toolbox: toolbox,
        media: '../../media/'});
+
+  // TODO(quacht): move into Export workspace
+  BlockLibrary.Export.mainWorkspace = Blockly.inject('exporterMain',
+      {media: '../../media/',
+      scrollbars: true});
+  // TODO(quacht): move into Export workspace
+  BlockLibrary.Export.previewWorkspace = Blockly.inject('exporterPreview',
+      {media: '../../media/',
+      scrollbars: true});
 
   // Create the root block.
   if ('BlocklyStorage' in window && window.location.hash.length > 1) {
