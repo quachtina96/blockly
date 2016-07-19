@@ -31,7 +31,7 @@ var mainWorkspace = null;
 
 /**
  * Workspace for preview of block.
- * @type
+ * @type {Blockly.Workspace}
  */
 var previewWorkspace = null;
 
@@ -1061,13 +1061,13 @@ BlockLibrary.Export = {};
 /**
  * Hidden workspace for the Block Library Exporter that holds pieces that make
  * up the block
- * @type
+ * @type {Blockly.Workspace}
  */
 BlockLibrary.Export.mainWorkspace = null;
 
 /**
  * Hidden workspace for the Block Library Exporter that holds preview of block
- * @type
+ * @type {Blockly.Workspace}
  */
 BlockLibrary.Export.previewWorkspace = null;
 
