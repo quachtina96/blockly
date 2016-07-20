@@ -1053,23 +1053,31 @@ BlockLibrary.populateBlockLibrary = function() {
 };
 
 /**
-* namespace for Block Library Export
-* @namespace Export
+* Block Library Export Class
+* @constructor
+*
+* @param {string} mainContainer - ID of div element to contain the exporter's
+* hidden main workspace
+* @param {string} previewContainer - ID of div element to contain the exporter's
+* hidden preview workspace
 */
-BlockLibrary.Export = {};
-
-/**
- * Hidden workspace for the Block Library Exporter that holds pieces that make
- * up the block
- * @type {Blockly.Workspace}
- */
-BlockLibrary.Export.mainWorkspace = null;
-
-/**
- * Hidden workspace for the Block Library Exporter that holds preview of block
- * @type {Blockly.Workspace}
- */
-BlockLibrary.Export.previewWorkspace = null;
+BlockLibrary.Exporter = function(mainContainer, previewContainer) {
+  /**
+   * Hidden workspace for the Block Library Exporter that holds pieces that make
+   * up the block
+   * @type {Blockly.Workspace}
+   */
+  this.mainWorkspace = Blockly.inject('exporterMain',
+      {media: '../../media/',
+      scrollbars: true});
+  /**
+   * Hidden workspace for the Block Library Exporter that holds preview of block
+   * @type {Blockly.Workspace}
+   */
+  this.previewWorkspace = Blockly.inject('exporterPreview',
+      {media: '../../media/',
+      scrollbars: true});
+};
 
 /**
  * Return the given language code of each block type in an array.
@@ -1080,7 +1088,7 @@ BlockLibrary.Export.previewWorkspace = null;
  * @return {string} in the desired format, the concatenation of each block's
  * language code.
  */
-BlockLibrary.Export.getBlockDefs = function(blockTypes, definitionFormat) {
+BlockLibrary.Export.prototype.getBlockDefs = function(blockTypes, definitionFormat) {
   var blockCode = [];
   for (var i = 0; i < blockTypes.length; i++) {
     var blockType = blockTypes[i];
@@ -1112,7 +1120,7 @@ BlockLibrary.Export.getBlockDefs = function(blockTypes, definitionFormat) {
  * @return {string} in the desired format, the concatenation of each block's
  * generator code.
  */
-BlockLibrary.Export.getGeneratorCode = function(blockTypes, generatorLanguage) {
+BlockLibrary.Export.prototype.getGeneratorCode = function(blockTypes, generatorLanguage) {
   var multiblockCode = [];
   // Define the custom blocks so we can create instances of them in the
   // exporter workspace
@@ -1142,7 +1150,7 @@ BlockLibrary.Export.getGeneratorCode = function(blockTypes, generatorLanguage) {
  *     'Dart'
  * @return {string} generator code for multiple blocks.
  */
-BlockLibrary.Export.getGeneratorStub = function(block, generatorLanguage){
+BlockLibrary.Export.prototype.getGeneratorStub = function(block, generatorLanguage){
   function makeVar(root, name) {
     name = name.toLowerCase().replace(/\W/g, '_');
     return '  var ' + root + '_' + name;
@@ -1306,14 +1314,6 @@ function init() {
       {collapse: false,
        toolbox: toolbox,
        media: '../../media/'});
-
-  // TODO(quacht): move into Export workspace
-  BlockLibrary.Export.mainWorkspace = Blockly.inject('exporterMain',
-      {media: '../../media/',
-      scrollbars: true});
-  BlockLibrary.Export.previewWorkspace = Blockly.inject('exporterPreview',
-      {media: '../../media/',
-      scrollbars: true});
 
   // Create the root block.
   if ('BlocklyStorage' in window && window.location.hash.length > 1) {
