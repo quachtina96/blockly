@@ -909,7 +909,7 @@ BlockLibrary.Storage.prototype.clear = function() {
 /**
  * Saves block to block library.
  *
- * @param {string} blockType - name of block
+ * @param {string} blockType - type of block
  * @param {Element} blockXML - the block's XML pulled from workspace
  */
 BlockLibrary.Storage.prototype.addBlock = function(blockType, blockXML) {
@@ -920,7 +920,7 @@ BlockLibrary.Storage.prototype.addBlock = function(blockType, blockXML) {
 /**
  * Removes block from current block library (this.blocks).
  *
- * @param {string} blockType - name of block
+ * @param {string} blockType - type of block
  */
 BlockLibrary.Storage.prototype.removeBlock = function(blockType) {
   this.blocks[blockType] = null;
@@ -1128,7 +1128,7 @@ BlockLibrary.Export.getGeneratorCode = function(blockTypes, generatorLanguage) {
     tempBlock.setDeletable(false);
     tempBlock.moveBy(15, 10);
     BlockLibrary.Export.previewWorkspace.clearUndo();
-    var blockGenCode = BlockLibrary.Export.updateGenerator(tempBlock, generatorLanguage);
+    var blockGenCode = BlockLibrary.Export.getGeneratorStub(tempBlock, generatorLanguage);
     multiblockCode.push(blockGenCode);
   }
   return multiblockCode.join("\n\n");
@@ -1142,7 +1142,7 @@ BlockLibrary.Export.getGeneratorCode = function(blockTypes, generatorLanguage) {
  *     'Dart'
  * @return {string} generator code for multiple blocks.
  */
-BlockLibrary.Export.updateGenerator = function(block, generatorLanguage){
+BlockLibrary.Export.getGeneratorStub = function(block, generatorLanguage){
   function makeVar(root, name) {
     name = name.toLowerCase().replace(/\W/g, '_');
     return '  var ' + root + '_' + name;
