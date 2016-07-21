@@ -1100,10 +1100,12 @@ BlockLibrary.Exporter.prototype.getBlockDefs = function(blockTypes, definitionFo
     var blockType = blockTypes[i];
     var xml = BlockLibrary.storage.getBlockXML(blockType);
 
+    // Render and get block from hidden workspace.
     this.hiddenWorkspace.clear();
     Blockly.Xml.domToWorkspace(xml, this.hiddenWorkspace);
     var rootBlock = getRootBlock(this.hiddenWorkspace);
 
+    // Generate the block's definition.
     blockType = blockType.replace(/\W/g, '_').replace(/^(\d)/, '_\\1');
     switch (definitionFormat) {
       case 'JSON':
@@ -1113,6 +1115,7 @@ BlockLibrary.Exporter.prototype.getBlockDefs = function(blockTypes, definitionFo
         var code = formatJavaScript_(blockType, rootBlock);
         break;
     }
+    // Add block's definition to the definitions to return.
     blockCode.push(code);
   }
   return blockCode.join("\n\n");
@@ -1128,17 +1131,21 @@ BlockLibrary.Exporter.prototype.getBlockDefs = function(blockTypes, definitionFo
  * @return {string} in the desired format, the concatenation of each block's
  * generator code.
  */
-BlockLibrary.Exporter.prototype.getGeneratorCode = function(blockTypes, generatorLanguage) {
+BlockLibrary.Exporter.prototype.getGeneratorCode =
+    function(blockTypes, generatorLanguage) {
   var multiblockCode = [];
-  // Define the custom blocks so we can create instances of them in the
-  // exporter workspace
+  // Define the custom blocks in order to be able to create instances of them in the
+  // exporter workspace.
   var blockDefs = this.getBlockDefs(blockTypes, 'JavaScript');
   eval(blockDefs);
+
   for (var i = 0; i < blockTypes.length; i++) {
     var blockType = blockTypes[i];
+    // Render the preview block in the hidden workspace.
     this.hiddenWorkspace.clear();
     var tempBlock = this.hiddenWorkspace.newBlock(blockType);
     this.hiddenWorkspace.clearUndo();
+    // Get generator stub for the given block and add to  generator code.
     var blockGenCode = getGeneratorStub(tempBlock, generatorLanguage);
     multiblockCode.push(blockGenCode);
   }
