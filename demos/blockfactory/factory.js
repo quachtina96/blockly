@@ -1072,26 +1072,17 @@ BlockLibrary.populateBlockLibrary = function() {
 * @constructor
 *
 * @param {string} mainContainer - ID of div element to contain the exporter's
-* hidden main workspace
-* @param {string} previewContainer - ID of div element to contain the exporter's
-* hidden preview workspace
+* hidden workspace
 */
-BlockLibrary.Exporter = function(mainContainer, previewContainer) {
+BlockLibrary.Exporter = function(hiddenWorkspaceContainerID) {
   /**
    * Hidden workspace for the Block Library Exporter that holds pieces that make
    * up the block
    * @type {Blockly.Workspace}
    */
-  this.mainWorkspace = Blockly.inject('exporterMain',
-      {media: '../../media/',
-      scrollbars: true});
-  /**
-   * Hidden workspace for the Block Library Exporter that holds preview of block
-   * @type {Blockly.Workspace}
-   */
-  this.previewWorkspace = Blockly.inject('exporterPreview',
-      {media: '../../media/',
-      scrollbars: true});
+  this.hiddenWorkspace =  Blockly.inject(hiddenWorkspaceContainerID,
+      {collapse: false,
+       media: '../../media/'});
 };
 
 /**
@@ -1109,9 +1100,9 @@ BlockLibrary.Exporter.prototype.getBlockDefs = function(blockTypes, definitionFo
     var blockType = blockTypes[i];
     var xml = BlockLibrary.storage.getBlockXML(blockType);
 
-    this.mainWorkspace.clear();
-    Blockly.Xml.domToWorkspace(xml, this.mainWorkspace);
-    var rootBlock = getRootBlock(this.mainWorkspace);
+    this.hiddenWorkspace.clear();
+    Blockly.Xml.domToWorkspace(xml, this.hiddenWorkspace);
+    var rootBlock = getRootBlock(this.hiddenWorkspace);
 
     blockType = blockType.replace(/\W/g, '_').replace(/^(\d)/, '_\\1');
     switch (definitionFormat) {
@@ -1145,14 +1136,9 @@ BlockLibrary.Exporter.prototype.getGeneratorCode = function(blockTypes, generato
   eval(blockDefs);
   for (var i = 0; i < blockTypes.length; i++) {
     var blockType = blockTypes[i];
-    this.previewWorkspace.clear();
-    var tempBlock = this.previewWorkspace.newBlock(blockType);
-    tempBlock.initSvg();
-    tempBlock.render();
-    tempBlock.setMovable(false);
-    tempBlock.setDeletable(false);
-    tempBlock.moveBy(15, 10);
-    this.previewWorkspace.clearUndo();
+    this.hiddenWorkspace.clear();
+    var tempBlock = this.hiddenWorkspace.newBlock(blockType);
+    this.hiddenWorkspace.clearUndo();
     var blockGenCode = getGeneratorStub(tempBlock, generatorLanguage);
     multiblockCode.push(blockGenCode);
   }
