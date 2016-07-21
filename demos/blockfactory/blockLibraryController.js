@@ -31,9 +31,9 @@ BlockLibrary.Controller.getCurrentBlockType = function() {
  */
 BlockLibrary.Controller.removeFromBlockLibrary = function() {
   var blockType = BlockLibrary.Controller.getCurrentBlockType();
-  BlockLibrary.storage.removeBlock(blockType);
-  BlockLibrary.storage.saveToLocalStorage();
-  BlockLibrary.populateBlockLibrary();
+  BlockLibrary.Controller.storage.removeBlock(blockType);
+  BlockLibrary.Controller.storage.saveToLocalStorage();
+  BlockLibrary.Controller.populateBlockLibrary(BlockLibrary.name);
 };
 
 /**

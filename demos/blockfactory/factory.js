@@ -71,6 +71,12 @@ BlockFactory.formatChange = function() {
   BlockFactory.disableEnableLink();
 };
 
+
+/**
+ * Get language code for the current block.
+ * @param rootBlock
+ */
+
 /**
  * Update the language code based on constructs made in Blockly.
  */
