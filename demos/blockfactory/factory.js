@@ -222,7 +222,7 @@ BlockFactory.formatJavaScript_ = function(blockType, rootBlock) {
         name = BlockFactory.escapeString(contentsBlock.getFieldValue('INPUTNAME'));
       }
       code.push('    this.' + TYPES[contentsBlock.type] + '(' + name + ')');
-      var check = getOptTypesFrom(contentsBlock, 'TYPE');
+      var check = BlockFactory.getOptTypesFrom(contentsBlock, 'TYPE');
       if (check) {
         code.push('        .setCheck(' + check + ')');
       }

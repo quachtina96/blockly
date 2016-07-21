@@ -41,8 +41,7 @@ BlockLibrary.Exporter = function(hiddenWorkspaceContainerID) {
  * @return {string} in the desired format, the concatenation of each block's
  * language code.
  */
-BlockLibrary.Exporter.prototype.getBlockDefs =
-    function(blockTypes, definitionFormat) {
+BlockLibrary.Exporter.prototype.getBlockDefs = function(blockTypes, definitionFormat) {
   var blockCode = [];
   for (var i = 0; i < blockTypes.length; i++) {
     var blockType = blockTypes[i];
@@ -79,8 +78,7 @@ BlockLibrary.Exporter.prototype.getBlockDefs =
  * @return {string} in the desired format, the concatenation of each block's
  * generator code.
  */
-BlockLibrary.Exporter.prototype.getGeneratorCode =
-    function(blockTypes, generatorLanguage) {
+BlockLibrary.Exporter.prototype.getGeneratorCode = function(blockTypes, generatorLanguage) {
   var multiblockCode = [];
   // Define the custom blocks in order to be able to create instances of them in
   // the exporter workspace.

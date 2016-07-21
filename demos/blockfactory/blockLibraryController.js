@@ -10,15 +10,9 @@
 goog.provide('BlockLibrary.Controller');
 
 goog.require('BlockLibrary');
-goog.require('BlockLibrary.Store');
+goog.require('BlockLibrary.Storage');
 goog.require('BlockLibrary.UI');
 goog.require('BlockFactory');
-
-/**
-* namespace for Block Library
-* @namespace BlockLibrary
-*/
-var BlockLibrary = {};
 
 /**
  * Returns the block type of the block the user is building.
@@ -100,7 +94,7 @@ BlockLibrary.Controller.isInBlockLibrary = function(blockType) {
  * @param {string} libraryName - name of Block Library
  */
 BlockLibrary.Controller.populateBlockLibrary = function(libraryName) {
-  BlockLibrary.Controller.storage = BlockLibrary.Store.Storage(libraryName);
+  BlockLibrary.Controller.storage = new BlockLibrary.Storage(libraryName);
   if (BlockLibrary.Controller.storage.isEmpty()) {
     alert('Your block library is empty! Click "Save to Block Library" so ' +
          'you can reopen it the next time you visit Block Factory!');

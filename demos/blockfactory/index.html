@@ -10,11 +10,13 @@
   <script src="../../blockly_uncompressed.js"></script>
   <script src="../../generators/javascript.js"></script>
   <script src="factory.js"></script>
-  <script src="block_library_ui.js"></script>
-  <script src="block_library_storage.js"></script>
-  <script src="block_library.js"></script>
-  <script src="block_library_exporter.js"></script>
+  <script src="blockLibrary.js"></script>
+  <script src="blockLibraryUI.js"></script>
+  <script src="blockLibraryStorage.js"></script>
+  <script src="blockLibraryController.js"></script>
+  <script src="blockLibraryExporter.js"></script>
   <script src="blocks.js"></script>
+  <script src="init.js"></script>
   <link rel="stylesheet" href="factory.css">
   <link rel="stylesheet" href="../prettify.css">
   <script src="../prettify.js"></script>
@@ -33,7 +35,7 @@
             <td style="vertical-align: bottom;">
             <span>
               <h3>Block Library:</h3>
-              <select id="blockLibraryDropdown" onChange="BlockLibrary.selectHandler(this);">
+              <select id="blockLibraryDropdown" onChange="BlockLibrary.Controller.selectHandler(this);">
               </select>
             </span>
             </td>
@@ -190,120 +192,5 @@
       <block type="colour_hue"><mutation colour="330"></mutation><field name="HUE">330</field></block>
     </category>
   </xml>
-  <script>
-  /**
-   * Initialize Blockly and layout.  Called on page load.
-   */
-  function init() {
-    if ('BlocklyStorage' in window) {
-      BlocklyStorage.HTTPREQUEST_ERROR =
-          'There was a problem with the request.\n';
-      BlocklyStorage.LINK_ALERT =
-          'Share your blocks with this link:\n\n%1';
-      BlocklyStorage.HASH_ERROR =
-          'Sorry, "%1" doesn\'t correspond with any saved Blockly file.';
-      BlocklyStorage.XML_ERROR = 'Could not load your saved file.\n' +
-          'Perhaps it was created with a different version of Blockly?';
-      var linkButton = document.getElementById('linkButton');
-      linkButton.style.display = 'inline-block';
-      linkButton.addEventListener('click',
-          function() {BlocklyStorage.link(mainWorkspace);});
-      disableEnableLink();
-    }
-
-    // Initialize Block Library and Exporter.
-    BlockLibrary.name = 'blockLibrary';
-    BlockLibrary.populateBlockLibrary(BlockLibrary.name);
-    BlockLibrary.exporter =
-        new BlockLibrary.Exporter('exporterHiddenWorkspace');
-
-    // Assign button click handlers.
-    document.getElementById('localSaveButton')
-      .addEventListener('click', BlockLibrary.saveWorkspaceToFile);
-
-    document.getElementById('saveToBlockLibraryButton')
-      .addEventListener('click', BlockLibrary.saveToBlockLibrary);
-
-    document.getElementById('clearBlockLibraryButton')
-      .addEventListener('click', BlockLibrary.clearBlockLibrary);
-
-    document.getElementById('removeBlockFromLibraryButton')
-      .addEventListener('click', BlockLibrary.removeFromBlockLibrary);
-
-    document.getElementById('downloadFromLibButton')
-      .addEventListener('click', BlockLibrary.downloadBlockFiles);
-
-    document.getElementById('files').addEventListener('change',
-      function() {
-        importBlockFromFile();
-        // Clear this so that the change event still fires even if the
-        // same file is chosen again. If the user re-imports a file, we
-        // want to reload the workspace with its contents.
-        this.value = null;
-      });
-
-    document.getElementById('helpButton').addEventListener('click',
-      function() {
-        open('https://developers.google.com/blockly/custom-blocks/block-factory',
-             'BlockFactoryHelp');
-      });
-    document.getElementById('downloadBlocks').addEventListener('click',
-      function() {
-        downloadTextArea('blocks', 'languagePre');
-      });
-
-    document.getElementById('downloadGenerator').addEventListener('click',
-      function() {
-        downloadTextArea('generator', 'generatorPre');
-      });
-
-    var expandList = [
-      document.getElementById('blockly'),
-      document.getElementById('blocklyMask'),
-      document.getElementById('preview'),
-      document.getElementById('languagePre'),
-      document.getElementById('languageTA'),
-      document.getElementById('generatorPre')
-    ];
-    var onresize = function(e) {
-      for (var i = 0, expand; expand = expandList[i]; i++) {
-        expand.style.width = (expand.parentNode.offsetWidth - 2) + 'px';
-        expand.style.height = (expand.parentNode.offsetHeight - 2) + 'px';
-      }
-    };
-    onresize();
-    window.addEventListener('resize', onresize);
-
-    var toolbox = document.getElementById('toolbox');
-    mainWorkspace = Blockly.inject('blockly',
-        {collapse: false,
-         toolbox: toolbox,
-         media: '../../media/'});
-
-    // Create the root block.
-    if ('BlocklyStorage' in window && window.location.hash.length > 1) {
-      BlocklyStorage.retrieveXml(window.location.hash.substring(1),
-                                 mainWorkspace);
-    } else {
-      var xml = '<xml><block type="factory_base" deletable="false" ' +
-          'movable="false"></block></xml>';
-      Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(xml), mainWorkspace);
-    }
-    mainWorkspace.clearUndo();
-
-    mainWorkspace.addChangeListener(updateLanguage);
-    document.getElementById('direction')
-        .addEventListener('change', updatePreview);
-    document.getElementById('languageTA')
-        .addEventListener('change', updatePreview);
-    document.getElementById('languageTA')
-        .addEventListener('keyup', updatePreview);
-    document.getElementById('format')
-        .addEventListener('change', formatChange);
-    document.getElementById('language')
-        .addEventListener('change', updatePreview);
-  }
-  window.addEventListener('load', init);
-  </script>
 </body>
 </html>
