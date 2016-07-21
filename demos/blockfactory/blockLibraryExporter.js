@@ -47,10 +47,11 @@ BlockLibrary.Exporter.prototype.getBlockDefs = function(blockTypes, definitionFo
     var blockType = blockTypes[i];
     var xml = BlockLibrary.Controller.storage.getBlockXML(blockType);
 
-    // Render and get block from hidden workspace.
+    // Render and get blocks (that define the preview block) from hidden workspace.
     this.hiddenWorkspace.clear();
     Blockly.Xml.domToWorkspace(xml, this.hiddenWorkspace);
     var rootBlock = BlockFactory.getRootBlock(this.hiddenWorkspace);
+    console.log(rootBlock.type);
 
     // Generate the block's definition.
     blockType = blockType.replace(/\W/g, '_').replace(/^(\d)/, '_\\1');

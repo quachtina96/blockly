@@ -618,7 +618,7 @@ BlockFactory.getGeneratorStub = function(block, generatorLanguage) {
  * @param {!Blockly.Block} block Rendered block in preview workspace.
  */
 BlockFactory.updateGenerator = function(block) {
-  var language = document.getElementById('language');
+  var language = document.getElementById('language').value;
   var generatorStub = BlockFactory.getGeneratorStub(block, language);
   BlockFactory.injectCode(generatorStub, 'generatorPre');
 };
