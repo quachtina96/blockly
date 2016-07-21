@@ -24,32 +24,26 @@
 'use strict';
 
 /**
- * Namespace for Block Factory.
- */
-goog.provide('BlockFactory');
-
-
-/**
  * Workspace for user to build block.
  * @type {Blockly.Workspace}
  */
-BlockFactory.mainWorkspace = null;
+var mainWorkspace = null;
 
 /**
  * Workspace for preview of block.
  * @type {Blockly.Workspace}
  */
-BlockFactory.previewWorkspace = null;
+var previewWorkspace = null;
 
 /**
  * Name of block if not named.
  */
-BlockFactory.UNNAMED = 'unnamed';
+var UNNAMED = 'unnamed';
 
 /**
  * Change the language code format.
  */
-BlockFactory.formatChange = function() {
+function formatChange() {
   var mask = document.getElementById('blocklyMask');
   var languagePre = document.getElementById('languagePre');
   var languageTA = document.getElementById('languageTA');
@@ -61,21 +55,21 @@ BlockFactory.formatChange = function() {
     var code = languagePre.textContent.trim();
     languageTA.value = code;
     languageTA.focus();
-    BlockFactory.updatePreview();
+    updatePreview();
   } else {
     mask.style.display = 'none';
     languageTA.style.display = 'none';
     languagePre.style.display = 'block';
-    BlockFactory.updateLanguage();
+    updateLanguage();
   }
-  BlockFactory.disableEnableLink();
-};
+  disableEnableLink();
+}
 
 /**
  * Update the language code based on constructs made in Blockly.
  */
-BlockFactory.updateLanguage = function() {
-  var rootBlock = BlockFactory.getRootBlock(BlockFactory.mainWorkspace);
+function updateLanguage() {
+  var rootBlock = getRootBlock(mainWorkspace);
   if (!rootBlock) {
     return;
   }
@@ -86,15 +80,15 @@ BlockFactory.updateLanguage = function() {
   blockType = blockType.replace(/\W/g, '_').replace(/^(\d)/, '_\\1');
   switch (document.getElementById('format').value) {
     case 'JSON':
-      var code = BlockFactory.formatJson_(blockType, rootBlock);
+      var code = formatJson_(blockType, rootBlock);
       break;
     case 'JavaScript':
-      var code = BlockFactory.formatJavaScript_(blockType, rootBlock);
+      var code = formatJavaScript_(blockType, rootBlock);
       break;
   }
-  BlockFactory.injectCode(code, 'languagePre');
-  BlockFactory.updatePreview();
-};
+  injectCode(code, 'languagePre');
+  updatePreview();
+}
 
 /**
  * Update the language code as JSON.
@@ -103,7 +97,7 @@ BlockFactory.updateLanguage = function() {
  * @return {string} Generanted language code.
  * @private
  */
-BlockFactory.formatJson_ = function(blockType, rootBlock) {
+function formatJson_(blockType, rootBlock) {
   var JS = {};
   // Type is not used by Blockly, but may be used by a loader.
   JS.type = blockType;
@@ -114,7 +108,7 @@ BlockFactory.formatJson_ = function(blockType, rootBlock) {
   var lastInput = null;
   while (contentsBlock) {
     if (!contentsBlock.disabled && !contentsBlock.getInheritedDisabled()) {
-      var fields = BlockFactory.getFieldsJson_(contentsBlock.getInputTargetBlock('FIELDS'));
+      var fields = getFieldsJson_(contentsBlock.getInputTargetBlock('FIELDS'));
       for (var i = 0; i < fields.length; i++) {
         if (typeof fields[i] == 'string') {
           message.push(fields[i].replace(/%/g, '%%'));
@@ -129,7 +123,7 @@ BlockFactory.formatJson_ = function(blockType, rootBlock) {
       if (contentsBlock.type != 'input_dummy') {
         input.name = contentsBlock.getFieldValue('INPUTNAME');
       }
-      var check = JSON.parse(BlockFactory.getOptTypesFrom(contentsBlock, 'TYPE') || 'null');
+      var check = JSON.parse(getOptTypesFrom(contentsBlock, 'TYPE') || 'null');
       if (check) {
         input.check = check;
       }
@@ -147,7 +141,7 @@ BlockFactory.formatJson_ = function(blockType, rootBlock) {
   // Remove last input if dummy and not empty.
   if (lastInput && lastInput.type == 'input_dummy') {
     var fields = lastInput.getInputTargetBlock('FIELDS');
-    if (fields && BlockFactory.getFieldsJson_(fields).join('').trim() != '') {
+    if (fields && getFieldsJson_(fields).join('').trim() != '') {
       var align = lastInput.getFieldValue('ALIGN');
       if (align != 'LEFT') {
         JS.lastDummyAlign0 = align;
@@ -170,21 +164,21 @@ BlockFactory.formatJson_ = function(blockType, rootBlock) {
   switch (rootBlock.getFieldValue('CONNECTIONS')) {
     case 'LEFT':
       JS.output =
-          JSON.parse(BlockFactory.getOptTypesFrom(rootBlock, 'OUTPUTTYPE') || 'null');
+          JSON.parse(getOptTypesFrom(rootBlock, 'OUTPUTTYPE') || 'null');
       break;
     case 'BOTH':
       JS.previousStatement =
-          JSON.parse(BlockFactory.getOptTypesFrom(rootBlock, 'TOPTYPE') || 'null');
+          JSON.parse(getOptTypesFrom(rootBlock, 'TOPTYPE') || 'null');
       JS.nextStatement =
-          JSON.parse(BlockFactory.getOptTypesFrom(rootBlock, 'BOTTOMTYPE') || 'null');
+          JSON.parse(getOptTypesFrom(rootBlock, 'BOTTOMTYPE') || 'null');
       break;
     case 'TOP':
       JS.previousStatement =
-          JSON.parse(BlockFactory.getOptTypesFrom(rootBlock, 'TOPTYPE') || 'null');
+          JSON.parse(getOptTypesFrom(rootBlock, 'TOPTYPE') || 'null');
       break;
     case 'BOTTOM':
       JS.nextStatement =
-          JSON.parse(BlockFactory.getOptTypesFrom(rootBlock, 'BOTTOMTYPE') || 'null');
+          JSON.parse(getOptTypesFrom(rootBlock, 'BOTTOMTYPE') || 'null');
       break;
   }
   // Generate colour.
@@ -196,7 +190,7 @@ BlockFactory.formatJson_ = function(blockType, rootBlock) {
   JS.tooltip = '';
   JS.helpUrl = 'http://www.example.com/';
   return JSON.stringify(JS, null, '  ');
-};
+}
 
 /**
  * Update the language code as JavaScript.
@@ -205,7 +199,7 @@ BlockFactory.formatJson_ = function(blockType, rootBlock) {
  * @return {string} Generanted language code.
  * @private
  */
-BlockFactory.formatJavaScript_ = function(blockType, rootBlock) {
+function formatJavaScript_(blockType, rootBlock) {
   var code = [];
   code.push("Blockly.Blocks['" + blockType + "'] = {");
   code.push("  init: function() {");
@@ -219,7 +213,7 @@ BlockFactory.formatJavaScript_ = function(blockType, rootBlock) {
       var name = '';
       // Dummy inputs don't have names.  Other inputs do.
       if (contentsBlock.type != 'input_dummy') {
-        name = BlockFactory.escapeString(contentsBlock.getFieldValue('INPUTNAME'));
+        name = escapeString(contentsBlock.getFieldValue('INPUTNAME'));
       }
       code.push('    this.' + TYPES[contentsBlock.type] + '(' + name + ')');
       var check = getOptTypesFrom(contentsBlock, 'TYPE');
@@ -230,7 +224,7 @@ BlockFactory.formatJavaScript_ = function(blockType, rootBlock) {
       if (align != 'LEFT') {
         code.push('        .setAlign(Blockly.ALIGN_' + align + ')');
       }
-      var fields = BlockFactory.getFieldsJs_(contentsBlock.getInputTargetBlock('FIELDS'));
+      var fields = getFieldsJs_(contentsBlock.getInputTargetBlock('FIELDS'));
       for (var i = 0; i < fields.length; i++) {
         code.push('        .appendField(' + fields[i] + ')');
       }
@@ -249,17 +243,17 @@ BlockFactory.formatJavaScript_ = function(blockType, rootBlock) {
   // Generate output, or next/previous connections.
   switch (rootBlock.getFieldValue('CONNECTIONS')) {
     case 'LEFT':
-      code.push(BlockFactory.connectionLineJs_('setOutput', 'OUTPUTTYPE'));
+      code.push(connectionLineJs_('setOutput', 'OUTPUTTYPE'));
       break;
     case 'BOTH':
-      code.push(BlockFactory.connectionLineJs_('setPreviousStatement', 'TOPTYPE'));
-      code.push(BlockFactory.connectionLineJs_('setNextStatement', 'BOTTOMTYPE'));
+      code.push(connectionLineJs_('setPreviousStatement', 'TOPTYPE'));
+      code.push(connectionLineJs_('setNextStatement', 'BOTTOMTYPE'));
       break;
     case 'TOP':
-      code.push(BlockFactory.connectionLineJs_('setPreviousStatement', 'TOPTYPE'));
+      code.push(connectionLineJs_('setPreviousStatement', 'TOPTYPE'));
       break;
     case 'BOTTOM':
-      code.push(BlockFactory.connectionLineJs_('setNextStatement', 'BOTTOMTYPE'));
+      code.push(connectionLineJs_('setNextStatement', 'BOTTOMTYPE'));
       break;
   }
   // Generate colour.
@@ -275,7 +269,7 @@ BlockFactory.formatJavaScript_ = function(blockType, rootBlock) {
   code.push('  }');
   code.push('};');
   return code.join('\n');
-};
+}
 
 /**
  * Create JS code required to create a top, bottom, or value connection.
@@ -284,16 +278,15 @@ BlockFactory.formatJavaScript_ = function(blockType, rootBlock) {
  * @return {string} Line of JavaScript code to create connection.
  * @private
  */
-BlockFactory.connectionLineJs_ = function(functionName, typeName) {
-  var type = BlockFactory.getOptTypesFrom(
-      BlockFactory.getRootBlock(BlockFactory.mainWorkspace), typeName);
+function connectionLineJs_(functionName, typeName) {
+  var type = getOptTypesFrom(getRootBlock(mainWorkspace), typeName);
   if (type) {
     type = ', ' + type;
   } else {
     type = '';
   }
   return '    this.' + functionName + '(true' + type + ');';
-};
+}
 
 /**
  * Returns field strings and any config.
@@ -301,71 +294,71 @@ BlockFactory.connectionLineJs_ = function(functionName, typeName) {
  * @return {!Array.<string>} Field strings.
  * @private
  */
-BlockFactory.getFieldsJs_ = function(block) {
+function getFieldsJs_(block) {
   var fields = [];
   while (block) {
     if (!block.disabled && !block.getInheritedDisabled()) {
       switch (block.type) {
         case 'field_static':
           // Result: 'hello'
-          fields.push(BlockFactory.escapeString(block.getFieldValue('TEXT')));
+          fields.push(escapeString(block.getFieldValue('TEXT')));
           break;
         case 'field_input':
           // Result: new Blockly.FieldTextInput('Hello'), 'GREET'
           fields.push('new Blockly.FieldTextInput(' +
-              BlockFactory.escapeString(block.getFieldValue('TEXT')) + '), ' +
-              BlockFactory.escapeString(block.getFieldValue('FIELDNAME')));
+              escapeString(block.getFieldValue('TEXT')) + '), ' +
+              escapeString(block.getFieldValue('FIELDNAME')));
           break;
         case 'field_angle':
           // Result: new Blockly.FieldAngle(90), 'ANGLE'
           fields.push('new Blockly.FieldAngle(' +
               parseFloat(block.getFieldValue('ANGLE')) + '), ' +
-              BlockFactory.escapeString(block.getFieldValue('FIELDNAME')));
+              escapeString(block.getFieldValue('FIELDNAME')));
           break;
         case 'field_checkbox':
           // Result: new Blockly.FieldCheckbox('TRUE'), 'CHECK'
           fields.push('new Blockly.FieldCheckbox(' +
-              BlockFactory.escapeString(block.getFieldValue('CHECKED')) + '), ' +
-              BlockFactory.escapeString(block.getFieldValue('FIELDNAME')));
+              escapeString(block.getFieldValue('CHECKED')) + '), ' +
+              escapeString(block.getFieldValue('FIELDNAME')));
           break;
         case 'field_colour':
           // Result: new Blockly.FieldColour('#ff0000'), 'COLOUR'
           fields.push('new Blockly.FieldColour(' +
-              BlockFactory.escapeString(block.getFieldValue('COLOUR')) + '), ' +
-              BlockFactory.escapeString(block.getFieldValue('FIELDNAME')));
+              escapeString(block.getFieldValue('COLOUR')) + '), ' +
+              escapeString(block.getFieldValue('FIELDNAME')));
           break;
         case 'field_date':
           // Result: new Blockly.FieldDate('2015-02-04'), 'DATE'
           fields.push('new Blockly.FieldDate(' +
-              BlockFactory.escapeString(block.getFieldValue('DATE')) + '), ' +
-              BlockFactory.escapeString(block.getFieldValue('FIELDNAME')));
+              escapeString(block.getFieldValue('DATE')) + '), ' +
+              escapeString(block.getFieldValue('FIELDNAME')));
           break;
         case 'field_variable':
           // Result: new Blockly.FieldVariable('item'), 'VAR'
-          var varname = BlockFactory.escapeString(block.getFieldValue('TEXT') || null);
+          var varname = escapeString(block.getFieldValue('TEXT') || null);
           fields.push('new Blockly.FieldVariable(' + varname + '), ' +
-              BlockFactory.escapeString(block.getFieldValue('FIELDNAME')));
+              escapeString(block.getFieldValue('FIELDNAME')));
           break;
         case 'field_dropdown':
           // Result:
           // new Blockly.FieldDropdown([['yes', '1'], ['no', '0']]), 'TOGGLE'
           var options = [];
           for (var i = 0; i < block.optionCount_; i++) {
-            options[i] = '[' + BlockFactory.escapeString(block.getFieldValue('USER' + i)) +
-                ', ' + BlockFactory.escapeString(block.getFieldValue('CPU' + i)) + ']';
+            options[i] = '[' + escapeString(block.getFieldValue('USER' + i)) +
+                ', ' + escapeString(block.getFieldValue('CPU' + i)) + ']';
           }
           if (options.length) {
             fields.push('new Blockly.FieldDropdown([' +
                 options.join(', ') + ']), ' +
-                BlockFactory.escapeString(block.getFieldValue('FIELDNAME')));
+                escapeString(block.getFieldValue('FIELDNAME')));
           }
           break;
         case 'field_image':
           // Result: new Blockly.FieldImage('http://...', 80, 60)
-          var src = BlockFactory.escapeString(block.getFieldValue('SRC'));
+          var src = escapeString(block.getFieldValue('SRC'));
           var width = Number(block.getFieldValue('WIDTH'));
           var height = Number(block.getFieldValue('HEIGHT'));
-          var alt = BlockFactory.escapeString(block.getFieldValue('ALT'));
+          var alt = escapeString(block.getFieldValue('ALT'));
           fields.push('new Blockly.FieldImage(' +
               src + ', ' + width + ', ' + height + ', ' + alt + ')');
           break;
@@ -374,7 +367,7 @@ BlockFactory.getFieldsJs_ = function(block) {
     block = block.nextConnection && block.nextConnection.targetBlock();
   }
   return fields;
-};
+}
 
 /**
  * Returns field strings and any config.
@@ -382,7 +375,7 @@ BlockFactory.getFieldsJs_ = function(block) {
  * @return {!Array.<string|!Object>} Array of static text and field configs.
  * @private
  */
-BlockFactory.getFieldsJson_ = function(block) {
+function getFieldsJson_(block) {
   var fields = [];
   while (block) {
     if (!block.disabled && !block.getInheritedDisabled()) {
@@ -461,16 +454,16 @@ BlockFactory.getFieldsJson_ = function(block) {
     block = block.nextConnection && block.nextConnection.targetBlock();
   }
   return fields;
-};
+}
 
 /**
  * Escape a string.
  * @param {string} string String to escape.
  * @return {string} Escaped string surrouned by quotes.
  */
-BlockFactory.escapeString = function(string) {
+function escapeString(string) {
   return JSON.stringify(string);
-};
+}
 
 /**
  * Fetch the type(s) defined in the given input.
@@ -479,8 +472,8 @@ BlockFactory.escapeString = function(string) {
  * @param {string} name Name of the input.
  * @return {?string} String defining the types.
  */
-BlockFactory.getOptTypesFrom = function(block, name) {
-  var types = BlockFactory.getTypesFrom_(block, name);
+function getOptTypesFrom(block, name) {
+  var types = getTypesFrom_(block, name);
   if (types.length == 0) {
     return undefined;
   } else if (types.indexOf('null') != -1) {
@@ -490,7 +483,7 @@ BlockFactory.getOptTypesFrom = function(block, name) {
   } else {
     return '[' + types.join(', ') + ']';
   }
-};
+}
 
 /**
  * Fetch the type(s) defined in the given input.
@@ -499,17 +492,17 @@ BlockFactory.getOptTypesFrom = function(block, name) {
  * @return {!Array.<string>} List of types.
  * @private
  */
-BlockFactory.getTypesFrom_ = function(block, name) {
+function getTypesFrom_(block, name) {
   var typeBlock = block.getInputTargetBlock(name);
   var types;
   if (!typeBlock || typeBlock.disabled) {
     types = [];
   } else if (typeBlock.type == 'type_other') {
-    types = [BlockFactory.escapeString(typeBlock.getFieldValue('TYPE'))];
+    types = [escapeString(typeBlock.getFieldValue('TYPE'))];
   } else if (typeBlock.type == 'type_group') {
     types = [];
     for (var n = 0; n < typeBlock.typeCount_; n++) {
-      types = types.concat(BlockFactory.getTypesFrom_(typeBlock, 'TYPE' + n));
+      types = types.concat(getTypesFrom_(typeBlock, 'TYPE' + n));
     }
     // Remove duplicates.
     var hash = Object.create(null);
@@ -520,7 +513,7 @@ BlockFactory.getTypesFrom_ = function(block, name) {
       hash[types[n]] = true;
     }
   } else {
-    types = [BlockFactory.escapeString(typeBlock.valueType)];
+    types = [escapeString(typeBlock.valueType)];
   }
   return types;
 }
@@ -533,7 +526,7 @@ BlockFactory.getTypesFrom_ = function(block, name) {
  *     'Dart'
  * @return {string} generator code for multiple blocks.
  */
-BlockFactory.getGeneratorStub = function(block, generatorLanguage) {
+function getGeneratorStub(block, generatorLanguage) {
   function makeVar(root, name) {
     name = name.toLowerCase().replace(/\W/g, '_');
     return '  var ' + root + '_' + name;
@@ -611,41 +604,41 @@ BlockFactory.getGeneratorStub = function(block, generatorLanguage) {
   code.push("};");
 
   return code.join('\n');
-};
+}
 
 /**
  * Update the generator code.
  * @param {!Blockly.Block} block Rendered block in preview workspace.
  */
-BlockFactory.updateGenerator = function(block) {
+function updateGenerator(block) {
   var language = document.getElementById('language');
-  var generatorStub = BlockFactory.getGeneratorStub(block, language);
-  BlockFactory.injectCode(generatorStub, 'generatorPre');
-};
+  var generatorStub = getGeneratorStub(block, language);
+  injectCode(generatorStub, 'generatorPre');
+}
 
 /**
  * Existing direction ('ltr' vs 'rtl') of preview.
  */
-BlockFactory.oldDir = null;
+var oldDir = null;
 
 /**
  * Update the preview display.
  */
-BlockFactory.updatePreview = function() {
+function updatePreview() {
   // Toggle between LTR/RTL if needed (also used in first display).
   var newDir = document.getElementById('direction').value;
-  if (BlockFactory.oldDir != newDir) {
-    if (BlockFactory.previewWorkspace) {
-      BlockFactory.previewWorkspace.dispose();
+  if (oldDir != newDir) {
+    if (previewWorkspace) {
+      previewWorkspace.dispose();
     }
     var rtl = newDir == 'rtl';
-    BlockFactory.previewWorkspace = Blockly.inject('preview',
+    previewWorkspace = Blockly.inject('preview',
         {rtl: rtl,
          media: '../../media/',
          scrollbars: true});
-    BlockFactory.oldDir = newDir;
+    oldDir = newDir;
   }
-  BlockFactory.previewWorkspace.clear();
+  previewWorkspace.clear();
 
   // Fetch the code and determine its format (JSON or JavaScript).
   var format = document.getElementById('format').value;
@@ -703,18 +696,18 @@ BlockFactory.updatePreview = function() {
     }
 
     // Create the preview block.
-    var previewBlock = BlockFactory.previewWorkspace.newBlock(blockType);
+    var previewBlock = previewWorkspace.newBlock(blockType);
     previewBlock.initSvg();
     previewBlock.render();
     previewBlock.setMovable(false);
     previewBlock.setDeletable(false);
     previewBlock.moveBy(15, 10);
-    BlockFactory.previewWorkspace.clearUndo();
-    BlockFactory.updateGenerator(previewBlock);
+    previewWorkspace.clearUndo();
+    updateGenerator(previewBlock);
   } finally {
     Blockly.Blocks = backupBlocks;
   }
-};
+}
 
 /**
  * Inject code into a pre tag, with syntax highlighting.
@@ -722,13 +715,13 @@ BlockFactory.updatePreview = function() {
  * @param {string} code Lines of code.
  * @param {string} id ID of <pre> element to inject into.
  */
-BlockFactory.injectCode = function(code, id) {
+function injectCode(code, id) {
   var pre = document.getElementById(id);
   pre.textContent = code;
   code = pre.innerHTML;
   code = prettyPrintOne(code, 'js');
   pre.innerHTML = code;
-};
+}
 
 /**
  * Return the uneditable container block that everything else attaches to in
@@ -737,7 +730,7 @@ BlockFactory.injectCode = function(code, id) {
  * @param {!Blockly.Workspace} workspace - where the root block lives
  * @return {Blockly.Block} root block
  */
-BlockFactory.getRootBlock = function(workspace) {
+function getRootBlock(workspace) {
   var blocks = workspace.getTopBlocks(false);
   for (var i = 0, block; block = blocks[i]; i++) {
     if (block.type == 'factory_base') {
@@ -745,7 +738,7 @@ BlockFactory.getRootBlock = function(workspace) {
     }
   }
   return null;
-};
+}
 
 /**
  * Generate a file from the contents of a given text area and
@@ -753,10 +746,10 @@ BlockFactory.getRootBlock = function(workspace) {
  * @param {string} filename The name of the file to create.
  * @param {string} id The text area to download.
 */
-BlockFactory.downloadTextArea = function(filename, id) {
+function downloadTextArea(filename, id) {
   var code = document.getElementById(id).textContent;
-  BlockFactory.createAndDownloadFile_(code, filename, 'plain');
-};
+  createAndDownloadFile_(code, filename, 'plain');
+}
 
 /**
  * Create a file with the given attributes and download it.
@@ -765,7 +758,7 @@ BlockFactory.downloadTextArea = function(filename, id) {
  * @param {string} fileType - The type of the file to save.
  * @private
  */
-BlockFactory.createAndDownloadFile_ = function(contents, filename, fileType) {
+function createAndDownloadFile_(contents, filename, fileType) {
   var data = new Blob([contents], {type: 'text/' + fileType});
   var clickEvent = new MouseEvent("click", {
     "view": window,
@@ -778,33 +771,33 @@ BlockFactory.createAndDownloadFile_ = function(contents, filename, fileType) {
   a.download = filename;
   a.textContent = 'Download file!';
   a.dispatchEvent(clickEvent);
-};
+}
 
 /**
  * Save the workspace's xml representation to a file.
  * @private
  */
-BlockFactory.saveWorkspaceToFile = function() {
-  var xmlElement = Blockly.Xml.workspaceToDom(BlockFactory.mainWorkspace);
+function saveWorkspaceToFile() {
+  var xmlElement = Blockly.Xml.workspaceToDom(mainWorkspace);
   var prettyXml = Blockly.Xml.domToPrettyText(xmlElement);
-  BlockFactory.createAndDownloadFile_(prettyXml, 'blockXml', 'xml');
-};
+  createAndDownloadFile_(prettyXml, 'blockXml', 'xml');
+}
 
 /**
  * Disable link and save buttons if the format is 'Manual', enable otherwise.
  */
-BlockFactory.disableEnableLink = function() {
+function disableEnableLink() {
   var linkButton = document.getElementById('linkButton');
   var saveBlockButton = document.getElementById('localSaveButton');
   var disabled = document.getElementById('format').value == 'Manual';
   linkButton.disabled = buttonDisabled;
   saveBlockButton.disabled = buttonDisabled;
-};
+}
 
 /**
  * Imports xml file for a block to the workspace.
  */
-BlockFactory.importBlockFromFile = function() {
+function importBlockFromFile() {
   var files = document.getElementById('files');
   // If the file list is empty, they user likely canceled in the dialog.
   if (files.files.length > 0) {
@@ -823,10 +816,10 @@ BlockFactory.importBlockFromFile = function() {
         window.alert(message + '\nXML: ' + fileContents);
         return;
       }
-      BlockFactory.mainWorkspace.clear();
-      Blockly.Xml.domToWorkspace(xml, BlockFactory.mainWorkspace);
+      mainWorkspace.clear();
+      Blockly.Xml.domToWorkspace(xml, mainWorkspace);
     });
 
     fileReader.readAsText(file);
   }
-};
+}
