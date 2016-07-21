@@ -8,8 +8,10 @@
 'use strict';
 
 goog.provide('BlockLibrary.Exporter');
-goog.require('BlockLibrary');
+
 goog.require('BlockFactory');
+goog.require('BlockLibrary');
+goog.require('BlockLibrary.Controller');
 
 
 /**
@@ -44,7 +46,7 @@ BlockLibrary.Exporter.prototype.getBlockDefs =
   var blockCode = [];
   for (var i = 0; i < blockTypes.length; i++) {
     var blockType = blockTypes[i];
-    var xml = BlockLibrary.storage.getBlockXML(blockType);
+    var xml = BlockLibrary.Controller.storage.getBlockXML(blockType);
 
     // Render and get block from hidden workspace.
     this.hiddenWorkspace.clear();
