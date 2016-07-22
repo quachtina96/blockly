@@ -1,6 +1,6 @@
 /**
- * @fileoverview Javascript for Block Library's Storage Class. Interfaces with
- * window's local storage to store blocks.
+ * @fileoverview Javascript for Block Library's Storage Class.
+ * Depends on Block Library for its namespace.
  *
  * @author quachtina96 (Tina Quach)
  */

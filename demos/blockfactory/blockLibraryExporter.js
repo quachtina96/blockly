@@ -1,6 +1,8 @@
 /**
- * @fileoverview Javascript for the Block Library Exporter class, which allows
- * users to export block definitions and generator stubs easily.
+ * @fileoverview Javascript for the Block Library Exporter class. Allows
+ * users to export block definitions and generator stubs of their saved blocks
+ * easily. Depends on the Block Library Controller for stored blocks, the Block
+ * Factory for code generation, and Block Library for its namespace.
  *
  * @author quachtina96 (Tina Quach)
  */
@@ -18,7 +20,7 @@ goog.require('BlockLibrary.Controller');
 * Block Library Export Class
 * @constructor
 *
-* @param {string} mainContainer - ID of div element to contain the exporter's
+* @param {string} hiddenWorkspaceContainerID - ID of div element to contain the exporter's
 * hidden workspace
 */
 BlockLibrary.Exporter = function(hiddenWorkspaceContainerID) {
@@ -41,13 +43,15 @@ BlockLibrary.Exporter = function(hiddenWorkspaceContainerID) {
  * @return {string} in the desired format, the concatenation of each block's
  * language code.
  */
-BlockLibrary.Exporter.prototype.getBlockDefs = function(blockTypes, definitionFormat) {
+BlockLibrary.Exporter.prototype.getBlockDefs =
+    function(blockTypes, definitionFormat) {
   var blockCode = [];
   for (var i = 0; i < blockTypes.length; i++) {
     var blockType = blockTypes[i];
     var xml = BlockLibrary.Controller.storage.getBlockXML(blockType);
 
-    // Render and get blocks (that define the preview block) from hidden workspace.
+    // Render and get blocks (that define the preview block) from hidden
+    // workspace.
     this.hiddenWorkspace.clear();
     Blockly.Xml.domToWorkspace(xml, this.hiddenWorkspace);
     var rootBlock = BlockFactory.getRootBlock(this.hiddenWorkspace);
@@ -79,7 +83,8 @@ BlockLibrary.Exporter.prototype.getBlockDefs = function(blockTypes, definitionFo
  * @return {string} in the desired format, the concatenation of each block's
  * generator code.
  */
-BlockLibrary.Exporter.prototype.getGeneratorCode = function(blockTypes, generatorLanguage) {
+BlockLibrary.Exporter.prototype.getGeneratorCode
+    = function(blockTypes, generatorLanguage) {
   var multiblockCode = [];
   // Define the custom blocks in order to be able to create instances of them in
   // the exporter workspace.
@@ -93,7 +98,8 @@ BlockLibrary.Exporter.prototype.getGeneratorCode = function(blockTypes, generato
     var tempBlock = this.hiddenWorkspace.newBlock(blockType);
     this.hiddenWorkspace.clearUndo();
     // Get generator stub for the given block and add to  generator code.
-    var blockGenCode = BlockFactory.getGeneratorStub(tempBlock, generatorLanguage);
+    var blockGenCode =
+        BlockFactory.getGeneratorStub(tempBlock, generatorLanguage);
     multiblockCode.push(blockGenCode);
   }
   return multiblockCode.join("\n\n");

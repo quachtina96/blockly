@@ -1,3 +1,10 @@
+/**
+ * @fileoverview Defines the init function called on load of the Block
+ * Factory Page and binds it to the onload event as its handler.
+ *
+ * @author quachtina96 (Tina Quach)
+ */
+
 goog.require('BlockFactory');
 goog.require('BlockLibrary');
 goog.require('BlockLibrary.UI');
@@ -31,10 +38,7 @@ function init() {
   BlockLibrary.exporter =
       new BlockLibrary.Exporter('exporterHiddenWorkspace');
 
-  // Assign button click handlers.
-  document.getElementById('localSaveButton')
-    .addEventListener('click', BlockFactory.saveWorkspaceToFile);
-
+  // Assign button click handlers for Block Library.
   document.getElementById('saveToBlockLibraryButton')
     .addEventListener('click', BlockLibrary.Controller.saveToBlockLibrary);
 
@@ -44,14 +48,9 @@ function init() {
   document.getElementById('removeBlockFromLibraryButton')
     .addEventListener('click', BlockLibrary.Controller.removeFromBlockLibrary);
 
-  document.getElementById('files').addEventListener('change',
-    function() {
-      BlockFactory.importBlockFromFile();
-      // Clear this so that the change event still fires even if the
-      // same file is chosen again. If the user re-imports a file, we
-      // want to reload the workspace with its contents.
-      this.value = null;
-    });
+  // Assign button event handlers for Block Factory.
+  document.getElementById('localSaveButton')
+    .addEventListener('click', BlockFactory.saveWorkspaceToFile);
 
   document.getElementById('helpButton').addEventListener('click',
     function() {
@@ -68,6 +67,16 @@ function init() {
       BlockFactory.downloadTextArea('generator', 'generatorPre');
     });
 
+  document.getElementById('files').addEventListener('change',
+    function() {
+      BlockFactory.importBlockFromFile();
+      // Clear this so that the change event still fires even if the
+      // same file is chosen again. If the user re-imports a file, we
+      // want to reload the workspace with its contents.
+      this.value = null;
+    });
+
+  // Handle resizing of elements.
   var expandList = [
     document.getElementById('blockly'),
     document.getElementById('blocklyMask'),
@@ -76,6 +85,7 @@ function init() {
     document.getElementById('languageTA'),
     document.getElementById('generatorPre')
   ];
+
   var onresize = function(e) {
     for (var i = 0, expand; expand = expandList[i]; i++) {
       expand.style.width = (expand.parentNode.offsetWidth - 2) + 'px';
@@ -85,13 +95,14 @@ function init() {
   onresize();
   window.addEventListener('resize', onresize);
 
+  // Inject Block Library Main Workspace
   var toolbox = document.getElementById('toolbox');
   BlockFactory.mainWorkspace = Blockly.inject('blockly',
       {collapse: false,
        toolbox: toolbox,
        media: '../../media/'});
 
-  // Create the root block.
+  // Create the root block.on main workspace.
   if ('BlocklyStorage' in window && window.location.hash.length > 1) {
     BlocklyStorage.retrieveXml(window.location.hash.substring(1),
                                BlockFactory.mainWorkspace);
