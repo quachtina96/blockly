@@ -24,6 +24,7 @@ BlockLibrary.UI.addOption = function(optionName, optionText, dropdownID) {
   var option = document.createElement('option');
   option.text = optionText;
   option.value = optionName;
+  option.selected = true;
   dropdown.add(option);
 };
 
@@ -32,7 +33,6 @@ BlockLibrary.UI.addOption = function(optionName, optionText, dropdownID) {
  *
  * @param {string} dropdownID - id of HTML select element within which to find
  *     the selected option.
- * TODO: split into removeOption and getSelectedOption
  */
 BlockLibrary.UI.removeSelectedOption = function(dropdownID) {
   var dropdown = document.getElementById(dropdownID);
@@ -40,6 +40,7 @@ BlockLibrary.UI.removeSelectedOption = function(dropdownID) {
     dropdown.remove(dropdown.selectedIndex);
   }
 };
+
 
 /**
  * Removes all options from dropdown.
