@@ -53,3 +53,14 @@ BlockLibrary.UI.clearOptions = function(dropdownID) {
     dropdown.remove(dropdown.length - 1);
   }
 };
+
+/**
+ * Returns block type of selected block.
+ *
+ * @param {Element} dropdown - HTML select element
+ * @return {string} type of block selected
+ */
+BlockLibrary.UI.getSelected = function(dropdown) {
+  var index = dropdown.selectedIndex;
+  return dropdown.options[index].value;
+};
