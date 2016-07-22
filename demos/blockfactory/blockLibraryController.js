@@ -48,7 +48,7 @@ BlockLibrary.Controller.removeFromBlockLibrary = function() {
  *
  * @param {string} blockType - block to edit on block factory
  */
-BlockLibrary.Controller.selectBlock = function(blockType) {
+BlockLibrary.Controller.openBlock = function(blockType) {
   var xml = BlockLibrary.Controller.storage.getBlockXML(blockType);
   BlockFactory.mainWorkspace.clear();
   Blockly.Xml.domToWorkspace(xml, BlockFactory.mainWorkspace);
@@ -61,7 +61,7 @@ BlockLibrary.Controller.selectBlock = function(blockType) {
  */
 BlockLibrary.Controller.selectHandler = function(blockLibraryDropdown) {
   var blockType = BlockLibrary.UI.getSelected(blockLibraryDropdown);
-  BlockLibrary.Controller.selectBlock(blockType);
+  BlockLibrary.Controller.openBlock(blockType);
 };
 
 /**
