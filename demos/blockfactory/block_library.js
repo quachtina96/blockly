@@ -280,7 +280,7 @@ BlockLibrary.Exporter.prototype.getBlockDefs = function(blockTypes, definitionFo
     Blockly.Xml.domToWorkspace(xml, this.hiddenWorkspace);
     var rootBlock = getRootBlock(this.hiddenWorkspace);
     // Generate the block's definition.
-    var code = BlockFactory.getBlockDefinition(blockType, rootBlock, definitionFormat);
+    var code = getBlockDefinition(blockType, rootBlock, definitionFormat);
     // Add block's definition to the definitions to return.
     blockCode.push(code);
   }
