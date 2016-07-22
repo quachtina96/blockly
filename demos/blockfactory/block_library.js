@@ -1,11 +1,4 @@
 /**
- * @fileoverview JavaScript for Block Library, an expansion upon Blockly's
- * Block Factory.
- *
- * @author quacht@google.com (Tina Quach)
- */
-
-/**
 * namespace for Block Library
 * @namespace BlockLibrary
 */
@@ -286,17 +279,8 @@ BlockLibrary.Exporter.prototype.getBlockDefs = function(blockTypes, definitionFo
     this.hiddenWorkspace.clear();
     Blockly.Xml.domToWorkspace(xml, this.hiddenWorkspace);
     var rootBlock = getRootBlock(this.hiddenWorkspace);
-
     // Generate the block's definition.
-    blockType = blockType.replace(/\W/g, '_').replace(/^(\d)/, '_\\1');
-    switch (definitionFormat) {
-      case 'JSON':
-        var code = formatJson_(blockType, rootBlock);
-        break;
-      case 'JavaScript':
-        var code = formatJavaScript_(blockType, rootBlock);
-        break;
-    }
+    var code = BlockFactory.getBlockDefinition(blockType, rootBlock, definitionFormat);
     // Add block's definition to the definitions to return.
     blockCode.push(code);
   }
