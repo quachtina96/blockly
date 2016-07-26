@@ -27,7 +27,7 @@
  * Namespace for Block Factory.
  */
 goog.provide('BlockFactory');
-goog.require('goog.dom.classes');
+goog.require('goog.dom.classlist');
 
 /**
  * Workspace for user to build block.
@@ -914,16 +914,29 @@ BlockFactory.addTabHandlers =
 
       blockFactoryTab.addEventListener('click',
         function() {
-          goog.dom.classes.swap(blockFactoryTab, 'taboff', 'tabon');
-          goog.dom.classes.swap(blockExporterTab, 'tabon', 'taboff');
+          // remove taboff class and add tabon class.
+          goog.dom.classlist.addRemove(blockFactoryTab, 'taboff', 'tabon');
+          goog.dom.classlist.addRemove(blockExporterTab, 'tabon', 'taboff');
+
+          // goog.dom.classes.remove(blockFactoryTab, 'taboff');
+          // goog.dom.classes.add(blockFactoryTab, 'tabon');
+          // goog.dom.classes.remove(blockExporterTab, 'tabon');
+          // goog.dom.classes.add(blockExporterTab, 'taboff');
+
           // Hide container of exporter.
           BlockFactory.hide('blockLibraryExporter');
         });
 
       blockExporterTab.addEventListener('click',
         function() {
-          goog.dom.classes.swap(blockFactoryTab, 'tabon', 'taboff');
-          goog.dom.classes.swap(blockExporterTab, 'taboff', 'tabon');
+          goog.dom.classlist.addRemove(blockFactoryTab, 'tabon', 'taboff');
+          goog.dom.classlist.addRemove(blockExporterTab, 'taboff', 'tabon');
+
+          // goog.dom.classes.remove(blockFactoryTab, 'taboff');
+          // goog.dom.classes.add(blockFactoryTab, 'tabon');
+          // goog.dom.classes.remove(blockExporterTab, 'tabon');
+          // goog.dom.classes.add(blockExporterTab, 'taboff');
+
           // Show container of exporter.
           BlockFactory.show('blockLibraryExporter');
         });

@@ -10,7 +10,9 @@ goog.require('BlockLibrary');
 goog.require('BlockLibrary.UI');
 goog.require('BlockLibrary.Storage');
 goog.require('BlockLibrary.Controller');
-goog.require('BlockLibrary.Exporter');
+goog.require('BlockExporter');
+goog.require('BlockExporter.Tools');
+goog.require('BlockExporter.View');
 
 /**
  * Initialize Blockly and layout.  Called on page load.
@@ -36,8 +38,10 @@ function init() {
   // Initialize Block Library and Exporter.
   BlockLibrary.name = 'blockLibrary';
   BlockLibrary.Controller.populateBlockLibrary(BlockLibrary.name);
-  BlockLibrary.exporter =
-      new BlockLibrary.Exporter('exporterHiddenWorkspace');
+  BlockExporter.view = new BlockExporter.View('blockLibraryExporter', BlockLibrary.Controller.storage);
+
+  document.getElementById('exporterSubmitButton')
+    .addEventListener('click', BlockExporter.view.exportBlocks());
 
   // Assign button click handlers for Block Library.
   document.getElementById('saveToBlockLibraryButton')
