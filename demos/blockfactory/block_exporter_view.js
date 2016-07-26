@@ -149,8 +149,6 @@ BlockExporter.View.prototype.updateHelperText = function(newText, opt_append) {
 /**
  * Get selected blocks from selector workspace, pulls info from the Export
  * Settings form in Block Exporter, and downloads block code accordingly.
- *
- * TODO(quacht): move getting the options to the view class?
  */
 BlockExporter.View.prototype.exportBlocks = function() {
   var blockTypes = this.getSelectedBlockTypes();

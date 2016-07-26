@@ -23,11 +23,11 @@ goog.require('goog.dom');
 BlockExporter.Tools = function() {
   // Create container for hidden workspace
   this.container = goog.dom.createDom('div',
-      {
-        'id': 'blockExporterTools_hiddenWorkspace',
-        'display':'none'
-      },
-      '' // Empty div
+    {
+      'id': 'blockExporterTools_hiddenWorkspace',
+      'display':'none'
+    },
+    '' // Empty div
     );
   goog.dom.appendChild(
       document.getElementsByTagName('body')[0], this.container);
