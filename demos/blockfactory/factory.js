@@ -914,14 +914,8 @@ BlockFactory.addTabHandlers =
 
       blockFactoryTab.addEventListener('click',
         function() {
-          // remove taboff class and add tabon class.
           goog.dom.classlist.addRemove(blockFactoryTab, 'taboff', 'tabon');
           goog.dom.classlist.addRemove(blockExporterTab, 'tabon', 'taboff');
-
-          // goog.dom.classes.remove(blockFactoryTab, 'taboff');
-          // goog.dom.classes.add(blockFactoryTab, 'tabon');
-          // goog.dom.classes.remove(blockExporterTab, 'tabon');
-          // goog.dom.classes.add(blockExporterTab, 'taboff');
 
           // Hide container of exporter.
           BlockFactory.hide('blockLibraryExporter');
@@ -931,11 +925,6 @@ BlockFactory.addTabHandlers =
         function() {
           goog.dom.classlist.addRemove(blockFactoryTab, 'tabon', 'taboff');
           goog.dom.classlist.addRemove(blockExporterTab, 'taboff', 'tabon');
-
-          // goog.dom.classes.remove(blockFactoryTab, 'taboff');
-          // goog.dom.classes.add(blockFactoryTab, 'tabon');
-          // goog.dom.classes.remove(blockExporterTab, 'tabon');
-          // goog.dom.classes.add(blockExporterTab, 'taboff');
 
           // Show container of exporter.
           BlockFactory.show('blockLibraryExporter');
