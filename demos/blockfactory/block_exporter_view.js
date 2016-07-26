@@ -183,6 +183,7 @@ BlockExporter.View.prototype.exportBlocks = function() {
     }
   }
 };
+
 //TODO(quacht): catch blocks' create and delete events.
 // upon create, disable block to limit the block to only one
 // also update helper text e.g.

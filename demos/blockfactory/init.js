@@ -40,10 +40,15 @@ function init() {
   // Initialize Block Library and Exporter.
   BlockLibrary.name = 'blockLibrary';
   BlockLibrary.Controller.populateBlockLibrary(BlockLibrary.name);
-  BlockExporter.view = new BlockExporter.View('blockLibraryExporter', BlockLibrary.Controller.storage);
+  BlockExporter.view = new BlockExporter.View('blockLibraryExporter',
+      BlockLibrary.Controller.storage);
 
-  document.getElementById('exporterSubmitButton')
-    .addEventListener('click', BlockExporter.view.exportBlocks);
+  document.getElementById('exporterSubmitButton').addEventListener('click',
+      function() {
+        var boundExportBlocks =
+            BlockExporter.view.exportBlocks.bind(BlockExporter.view);
+        boundExportBlocks();
+      });
 
   // Assign button click handlers for Block Library.
   document.getElementById('saveToBlockLibraryButton')
