@@ -27,7 +27,6 @@
  * Namespace for Block Factory.
  */
 goog.provide('BlockFactory');
-goog.require('goog.dom.classlist');
 
 /**
  * Workspace for user to build block.
