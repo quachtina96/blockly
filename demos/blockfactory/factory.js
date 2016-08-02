@@ -902,7 +902,7 @@ BlockFactory.hide = function(elementID) {
  * @param {string} elementID - ID of element to hide.
  */
 BlockFactory.show = function(elementID) {
-  document.getElementById(elementID).style.display = 'inline';
+  document.getElementById(elementID).style.display = 'block';
 };
 
 /**
