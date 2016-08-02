@@ -195,12 +195,6 @@ BlockExporterController.prototype.onDeselectBlockForExport_ = function(event) {
  * Deselects all blocks on tfhe selector workspace by deleting them.
  */
 BlockExporterController.prototype.clearSelectedBlocks = function() {
-  var blocksToClear = this.view.getSelectedBlocks();
-  for (var i = 0; i < blocksToClear.length; i++) {
-    // Fire a delete event for each block cleared from workspace to enable the
-    // block in selector toolbox.
-    Blockly.Events.fire(new Blockly.Events.Delete(blocksToClear[i]));
-  }
   // Clear selector workspace.
   this.view.clearSelectorWorkspace();
 };
