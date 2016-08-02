@@ -31,6 +31,11 @@ BlockLibraryController = function(blockLibraryName) {
   this.name = blockLibraryName;
   // Create a new, empty Block Library Storage object, or load existing one.
   this.storage = new BlockLibraryStorage(this.name);
+  this.DEFAULT_BLOCK_XML = '<xml xmlns="http://www.w3.org/1999' +
+    '/xhtml"><block type="factory_base" id="aT:m-a~5m]6,uj)Hen^," deletable="' +
+    'false" movable="false" x="0" y="0"><mutation connections="NONE">' +
+    '</mutation><field name="NAME">math_foo</field><field name="INLINE">AUTO' +
+    '</field><field name="CONNECTIONS">NONE</field></block></xml>';
 };
 
 /**
@@ -129,6 +134,10 @@ BlockLibraryController.prototype.populateBlockLibrary = function() {
          'you can reopen it the next time you visit Block Factory!');
   }
   BlockLibraryView.clearOptions('blockLibraryDropdown');
+  // Add Default Option (math_foo).
+  BlockLibraryView.addOption('math_foo', 'math_foo', 'blockLibraryDropdown', true);
+
+  // Add option for each saved block.
   var blockLibrary = this.storage.blocks;
   for (var block in blockLibrary) {
     // Make sure the block wasn't deleted.
@@ -136,4 +145,8 @@ BlockLibraryController.prototype.populateBlockLibrary = function() {
       BlockLibraryView.addOption(block, block, 'blockLibraryDropdown', false);
     }
   }
+};
+
+BlockLibraryController.prototype.openDefaultBlock = function() {
+
 };
