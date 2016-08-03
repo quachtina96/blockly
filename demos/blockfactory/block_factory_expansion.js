@@ -70,7 +70,16 @@ BlockFactoryExpansion.init = function() {
             onSelectedBlockChanged(blockLibraryDropdown);
       };
 
+  BlockFactoryExpansion.onCreateNewBlock = function() {
+    BlockFactory.mainWorkspace.clear();
+    BlockFactory.showStarterBlock();
+    // TODO(quacht): Update Block Library Dropdown to select the disabled
+    // dummy option. Do this after merging with the default dummy option branch
+  };
+
   // Assign button event handlers for Block Factory.
+  document.getElementById('createNewBlockButton')
+    .addEventListener('click', BlockFactoryExpansion.onCreateNewBlock);
   document.getElementById('localSaveButton')
     .addEventListener('click', BlockFactory.saveWorkspaceToFile);
 
@@ -182,15 +191,12 @@ BlockFactoryExpansion.init = function() {
 
   BlockFactoryExpansion.exporter.addChangeListenersToSelectorWorkspace();
 
-  // Create the root block.on main workspace.
+  // Create the root block on main workspace.
   if ('BlocklyStorage' in window && window.location.hash.length > 1) {
     BlocklyStorage.retrieveXml(window.location.hash.substring(1),
                                BlockFactory.mainWorkspace);
   } else {
-    var xml = '<xml><block type="factory_base" deletable="false" ' +
-        'movable="false"></block></xml>';
-    Blockly.Xml.domToWorkspace(
-        Blockly.Xml.textToDom(xml), BlockFactory.mainWorkspace);
+    BlockFactory.showStarterBlock();
   }
   BlockFactory.mainWorkspace.clearUndo();
 
