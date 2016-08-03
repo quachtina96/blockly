@@ -31,11 +31,6 @@ BlockLibraryController = function(blockLibraryName) {
   this.name = blockLibraryName;
   // Create a new, empty Block Library Storage object, or load existing one.
   this.storage = new BlockLibraryStorage(this.name);
-  this.DEFAULT_BLOCK_XML = '<xml xmlns="http://www.w3.org/1999' +
-    '/xhtml"><block type="factory_base" id="aT:m-a~5m]6,uj)Hen^," deletable="' +
-    'false" movable="false" x="0" y="0"><mutation connections="NONE">' +
-    '</mutation><field name="NAME">math_foo</field><field name="INLINE">AUTO' +
-    '</field><field name="CONNECTIONS">NONE</field></block></xml>';
 };
 
 /**
@@ -60,6 +55,7 @@ BlockLibraryController.prototype.removeFromBlockLibrary = function() {
   this.storage.removeBlock(blockType);
   this.storage.saveToLocalStorage();
   this.populateBlockLibrary();
+
 };
 
 /**
@@ -88,12 +84,14 @@ BlockLibraryController.prototype.onSelectedBlockChanged =
  * Clears the block library in local storage and updates the dropdown.
  */
 BlockLibraryController.prototype.clearBlockLibrary = function() {
-  var check = prompt(
-      'Are you sure you want to clear your Block Library? ("yes" or "no")');
-  if (check == "yes") {
+  var check = confirm(
+      'Click OK to clear your block library.');
+  if (check) {
     this.storage.clear();
     this.storage.saveToLocalStorage();
     BlockLibraryView.clearOptions('blockLibraryDropdown');
+    BlockLibraryView.addOption(
+      'BLOCK_LIBRARY_DEFAULT_BLANK', '', 'blockLibraryDropdown', true, false);
   }
 };
 
@@ -110,7 +108,7 @@ BlockLibraryController.prototype.saveToBlockLibrary = function() {
     this.storage.addBlock(blockType, xmlElement);
     this.storage.saveToLocalStorage();
     BlockLibraryView.addOption(
-        blockType, blockType, 'blockLibraryDropdown', true);
+        blockType, blockType, 'blockLibraryDropdown', true, true);
   }
 };
 
@@ -134,19 +132,16 @@ BlockLibraryController.prototype.populateBlockLibrary = function() {
          'you can reopen it the next time you visit Block Factory!');
   }
   BlockLibraryView.clearOptions('blockLibraryDropdown');
-  // Add Default Option (math_foo).
-  BlockLibraryView.addOption('math_foo', 'math_foo', 'blockLibraryDropdown', true);
-
+  BlockLibraryView.addOption(
+      'BLOCK_LIBRARY_DEFAULT_BLANK', '', 'blockLibraryDropdown', true, false);
   // Add option for each saved block.
   var blockLibrary = this.storage.blocks;
   for (var block in blockLibrary) {
     // Make sure the block wasn't deleted.
     if (blockLibrary[block] != null) {
-      BlockLibraryView.addOption(block, block, 'blockLibraryDropdown', false);
+      BlockLibraryView.addOption(
+          block, block, 'blockLibraryDropdown', false, true);
     }
   }
 };
 
-BlockLibraryController.prototype.openDefaultBlock = function() {
-
-};
