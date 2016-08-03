@@ -132,6 +132,7 @@ BlockLibraryController.prototype.populateBlockLibrary = function() {
          'you can reopen it the next time you visit Block Factory!');
   }
   BlockLibraryView.clearOptions('blockLibraryDropdown');
+  // Default blank option for when no block from library is selected.
   BlockLibraryView.addOption(
       'BLOCK_LIBRARY_DEFAULT_BLANK', '', 'blockLibraryDropdown', true, false);
   // Add option for each saved block.

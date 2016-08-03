@@ -25,7 +25,7 @@ BlockLibraryView.addOption = function(optionName, optionText, dropdownID, select
   option.text = optionText;
   option.value = optionName;
   option.selected = selected;
-  option.enabled = enabled;
+  option.disabled = !enabled;
   dropdown.add(option);
 };
 
