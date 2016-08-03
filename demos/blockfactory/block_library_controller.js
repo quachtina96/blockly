@@ -80,7 +80,8 @@ BlockLibraryController.prototype.onSelectedBlockChanged =
     };
 
 /**
- * Clears the block library in local storage and updates the dropdown.
+ * Confirms with user before clearing the block library in local storage and
+ * updating the dropdown.
  */
 BlockLibraryController.prototype.clearBlockLibrary = function() {
   var check = confirm(
@@ -89,8 +90,6 @@ BlockLibraryController.prototype.clearBlockLibrary = function() {
     this.storage.clear();
     this.storage.saveToLocalStorage();
     BlockLibraryView.clearOptions('blockLibraryDropdown');
-    BlockLibraryView.addOption(
-      'BLOCK_LIBRARY_DEFAULT_BLANK', '', 'blockLibraryDropdown', true, false);
   }
 };
 
@@ -131,9 +130,6 @@ BlockLibraryController.prototype.populateBlockLibrary = function() {
          'you can reopen it the next time you visit Block Factory!');
   }
   BlockLibraryView.clearOptions('blockLibraryDropdown');
-  // Default blank option for when no block from library is selected.
-  BlockLibraryView.addOption(
-      'BLOCK_LIBRARY_DEFAULT_BLANK', '', 'blockLibraryDropdown', true, false);
   // Add option for each saved block.
   var blockLibrary = this.storage.blocks;
   for (var block in blockLibrary) {

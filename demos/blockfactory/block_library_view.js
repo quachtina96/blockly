@@ -52,6 +52,9 @@ BlockLibraryView.clearOptions = function(dropdownID) {
   while (dropdown.length > 0) {
     dropdown.remove(dropdown.length - 1);
   }
+  // Default blank option for when no block from library is selected.
+  BlockLibraryView.addOption(
+      'BLOCK_LIBRARY_DEFAULT_BLANK', '', 'blockLibraryDropdown', true, false);
 };
 
 /**
