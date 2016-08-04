@@ -77,6 +77,22 @@ BlockExporterView.prototype.updateHelperText = function(newText, opt_append) {
 };
 
 /**
+ * Clears selector workspace.
+ */
+BlockExporterView.prototype.clearSelectorWorkspace = function() {
+  this.selectorWorkspace.clear();
+};
+
+/**
+ * Returns array of selected blocks.
+ *
+ * @return {Array.<Blockly.Block>} Array of all blocks in selector workspace.
+ */
+BlockExporterView.prototype.getSelectedBlocks = function() {
+  return this.selectorWorkspace.getAllBlocks();
+};
+
+/**
  * Updates the helper text to show list of currently selected blocks.
  *
  * @param {!Array} selectedBlockTypes - Array of blocks selected in workspace.
@@ -101,5 +117,4 @@ BlockExporterView.prototype.clearSelectorWorkspace = function() {
 BlockExporterView.prototype.getSelectedBlocks = function() {
   return this.selectorWorkspace.getAllBlocks();
 };
-
 

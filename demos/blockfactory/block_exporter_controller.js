@@ -192,8 +192,7 @@ BlockExporterController.prototype.onDeselectBlockForExport_ = function(event) {
 
 /**
  * Tied to the 'Clear Selected Blocks' button in the Block Exporter.
- * Deselects all blocks on the selector workspace by deleting them and updating
- * text accordingly.
+ * Deselects all blocks on tfhe selector workspace by deleting them.
  */
 BlockExporterController.prototype.clearSelectedBlocks = function() {
   // Clear selector workspace.
