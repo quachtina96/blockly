@@ -122,7 +122,7 @@ BlockLibraryController.prototype.saveToBlockLibrary = function() {
     return;
   }
   BlockLibraryView.addOption(
-      blockType, blockType, 'blockLibraryDropdown', true, false);
+      blockType, blockType, 'blockLibraryDropdown', true, true);
 };
 
 /**
