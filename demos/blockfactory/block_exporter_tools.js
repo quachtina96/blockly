@@ -79,7 +79,7 @@ BlockExporterTools.prototype.getBlockDefs =
     function(blockXmlMap, definitionFormat) {
       var blockCode = [];
       for (var blockType in blockXmlMap) {
-        var xml = blockXmlMap[blockType];
+        var xml= blockXmlMap[blockType];
         if (xml) {
           // Render and get block from hidden workspace.
           var rootBlock = this.getRootBlockFromXml_(xml);
@@ -121,7 +121,7 @@ BlockExporterTools.prototype.getGeneratorCode =
       var multiblockCode = [];
       // Define the custom blocks in order to be able to create instances of
       // them in the exporter workspace.
-      this.addBlockDefinitions_(blockXmlMap);
+      this.addBlockDefinitions(blockXmlMap);
 
       for (var blockType in blockXmlMap) {
         var xml = blockXmlMap[blockType];
@@ -147,11 +147,10 @@ BlockExporterTools.prototype.getGeneratorCode =
  * Evaluates block definition code of each block in given object mapping
  * block type to xml. Called in order to be able to create instances of the
  * blocks in the exporter workspace.
- * @private
  *
  * @param {!Object} blockXmlMap - Map of block type to xml.
  */
-BlockExporterTools.prototype.addBlockDefinitions_ = function(blockXmlMap) {
+BlockExporterTools.prototype.addBlockDefinitions = function(blockXmlMap) {
       var blockDefs = this.getBlockDefs(blockXmlMap, 'JavaScript');
       eval(blockDefs);
     };
@@ -160,6 +159,7 @@ BlockExporterTools.prototype.addBlockDefinitions_ = function(blockXmlMap) {
  * Pulls information about all blocks in the block library to generate xml
  * for the selector workpace's toolbox.
  *
+ * @param {!BlockLibrary.Storage} blockLibStorage - Block Library Storage object
  * @return {!Element} Xml representation of the toolbox.
  */
 BlockExporterTools.prototype.generateToolboxFromLibrary
@@ -176,7 +176,7 @@ BlockExporterTools.prototype.generateToolboxFromLibrary
 
       // Define the custom blocks in order to be able to create instances of
       // them in the exporter workspace.
-      this.addBlockDefinitions_(blockXmlMap);
+      this.addBlockDefinitions(blockXmlMap);
 
       for (var blockType in blockXmlMap) {
         // Create category DOM element.
