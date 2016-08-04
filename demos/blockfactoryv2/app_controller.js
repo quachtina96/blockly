@@ -82,10 +82,12 @@ AppController.prototype.importBlockLibraryFromFile = function() {
 AppController.prototype.exportBlockLibraryToFile = function() {
   // Get map of block type to xml.
   var blockLib = this.blockLibraryController.getBlockLibrary();
+  // Concatenate the xmls, each separated by a blank line.
   var blockLibText = this.formatBlockLibForExport_(blockLib);
+  // Get file name.
   var filename = prompt('Enter the file name under which to save your block' +
       'library.');
-  // TODO(quacht): Prettify the text.
+  // Download file if all necessary parameters are provided.
   if (filename) {
     BlockFactory.createAndDownloadFile_(blockLibText, filename, 'xml');
   } else {
