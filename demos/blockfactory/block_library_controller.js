@@ -103,7 +103,6 @@ BlockLibraryController.prototype.clearBlockLibrary = function() {
  */
 BlockLibraryController.prototype.saveToBlockLibrary = function() {
   var blockType = this.getCurrentBlockType();
-
   // If block under that name already exists, confirm that user wants to replace
   // saved block.
   if (this.isInBlockLibrary(blockType)) {
@@ -123,7 +122,7 @@ BlockLibraryController.prototype.saveToBlockLibrary = function() {
     return;
   }
   BlockLibraryView.addOption(
-      blockType, blockType, 'blockLibraryDropdown', true);
+      blockType, blockType, 'blockLibraryDropdown', true, false);
 };
 
 /**
