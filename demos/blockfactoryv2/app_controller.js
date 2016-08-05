@@ -76,7 +76,7 @@ AppController.prototype.importBlockLibraryFromFile = function() {
 };
 
 /**
- * Tied to the 'Export Block Library' button.Exports block library to file that
+ * Tied to the 'Export Block Library' button. Exports block library to file that
  * contains JSON mapping each block type to its xml text representation.
  */
 AppController.prototype.exportBlockLibraryToFile = function() {
