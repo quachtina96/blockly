@@ -164,7 +164,32 @@ BlockLibraryController.prototype.populateBlockLibrary = function() {
 
 /**
  * Return block library mapping block type to xml.
+ *
+ * @return {Object} Object mapping block type to xml text.
  */
- BlockLibraryController.prototype.getBlockLibrary = function() {
+BlockLibraryController.prototype.getBlockLibrary = function() {
   return this.storage.getBlockXmlTextMap();
 };
+
+/**
+ * Set the block library storage object from which exporter exports.
+ *
+ * @param {!BlockLibraryStorage} blockLibStorage - Block Library Storage
+ *    object.
+ */
+BlockLibraryController.prototype.setBlockLibStorage
+    = function(blockLibStorage) {
+  this.storage = blockLibStorage;
+};
+
+/**
+ * Get the block library storage object from which exporter exports.
+ *
+ * @return {!BlockLibraryStorage} blockLibStorage - Block Library Storage object
+ *    that stores the blocks.
+ */
+BlockLibraryController.prototype.getBlockLibStorage =
+    function(blockLibStorage) {
+  return this.blockLibStorage;
+};
+

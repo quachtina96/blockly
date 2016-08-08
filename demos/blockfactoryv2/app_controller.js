@@ -44,7 +44,8 @@ AppController.prototype.importBlockLibraryFromFile = function() {
     var file = files.files[0];
     var fileReader = new FileReader();
 
-    // Callback for when done reading the file.
+    // Create a map of block type to xml text from the file when it has been
+    // read.
     fileReader.addEventListener('load', function(event) {
       var fileContents = event.target.result;
       // Create empty object to hold the read block library information.
@@ -57,18 +58,19 @@ AppController.prototype.importBlockLibraryFromFile = function() {
         window.alert(message + '\nXML: ' + fileContents);
         return;
       }
+
       // Create a new block library storage object with inputted block library.
       var blockLibStorage = new BlockLibraryStorage(
           self.blockLibraryName, blockXmlTextMap);
 
       // Update block library controller with the new block library
       // storage.
-      self.blockLibraryController.storage = blockLibStorage;
+      self.blockLibraryController.setBlockLibStorage(blockLibStorage);
       // Update the block library dropdown.
       self.blockLibraryController.populateBlockLibrary();
-
       // Update the exporter's block library storage.
-      self.exporter.blockLibStorage = blockLibStorage;
+
+      self.exporter.setBlockLibStorage(blockLibStorage);
     });
     // Read the file.
     fileReader.readAsText(file);
