@@ -30,12 +30,12 @@ goog.require('Blockly.Block');
 goog.require('Blockly.Comment');
 goog.require('Blockly.Events');
 goog.require('Blockly.FlyoutButton');
+goog.require('Blockly.FlyoutLabel');
 goog.require('Blockly.WorkspaceSvg');
 goog.require('goog.dom');
 goog.require('goog.events');
 goog.require('goog.math.Rect');
 goog.require('goog.userAgent');
-
 
 /**
  * Class for a flyout.
@@ -93,6 +93,13 @@ Blockly.Flyout = function(workspaceOptions) {
    * @private
    */
   this.buttons_ = [];
+
+  /**
+   * List of labels.
+   * @type {!Array.<!Blockly.FlyoutLabel>}
+   * @private
+   */
+  this.labels_ = [];
 
   /**
    * List of event listeners.
@@ -649,6 +656,7 @@ Blockly.Flyout.prototype.show = function(xmlList) {
   for (var i = 0, xml; xml = xmlList[i]; i++) {
     if (xml.tagName) {
       var tagName = xml.tagName.toUpperCase();
+
       if (tagName == 'BLOCK') {
         var curBlock = Blockly.Xml.domToBlock(xml, this.workspace_);
         if (curBlock.disabled) {
@@ -673,11 +681,19 @@ Blockly.Flyout.prototype.show = function(xmlList) {
         } else {
           gaps.push(this.MARGIN * 3);
         }
+
       } else if (tagName == 'BUTTON') {
         var label = xml.getAttribute('text');
         var curButton = new Blockly.FlyoutButton(this.workspace_,
             this.targetWorkspace_, label);
         contents.push({type: 'button', button: curButton});
+        gaps.push(this.MARGIN);
+
+      } else if (tagName == 'LABEL') {
+        var label = xml.getAttribute('text');
+        var curLabel = new Blockly.FlyoutLabel(this.workspace_,
+            this.targetWorkspace_, label);
+        contents.push({type: 'label', label: curLabel});
         gaps.push(this.MARGIN);
       }
     }
@@ -729,6 +745,7 @@ Blockly.Flyout.prototype.layout_ = function(contents, gaps) {
   }
 
   for (var i = 0, item; item = contents[i]; i++) {
+
     if (item.type == 'block') {
       var block = item.block;
       var allBlocks = block.getDescendants();
@@ -764,6 +781,7 @@ Blockly.Flyout.prototype.layout_ = function(contents, gaps) {
       this.backgroundButtons_[i] = rect;
 
       this.addBlockListeners_(root, block, rect);
+
     } else if (item.type == 'button') {
       var button = item.button;
       var buttonSvg = button.createDom();
@@ -776,6 +794,18 @@ Blockly.Flyout.prototype.layout_ = function(contents, gaps) {
         cursorX += (button.width + gaps[i]);
       } else {
         cursorY += button.height + gaps[i];
+      }
+    } else if (item.type == 'label') {
+      var label = item.label;
+      var labelSvg = label.createDom();
+      label.moveTo(cursorX, cursorY);
+      label.show();
+
+      this.labels_.push(label);
+      if (this.horizontalLayout_) {
+        cursorX += (label.width + gaps[i]);
+      } else {
+        cursorY += label.height + gaps[i];
       }
     }
   }
@@ -1289,6 +1319,9 @@ Blockly.Flyout.prototype.reflowVertical = function(blocks) {
   }
   for (var i = 0, button; button = this.buttons_[i]; i++) {
     flyoutWidth = Math.max(flyoutWidth, button.width);
+  }
+  for (var i = 0, label; label = this.labels_[i]; i++) {
+    flyoutWidth = Math.max(flyoutWidth, label.width);
   }
   flyoutWidth += this.MARGIN * 1.5 + Blockly.BlockSvg.TAB_WIDTH;
   flyoutWidth *= this.workspace_.scale;

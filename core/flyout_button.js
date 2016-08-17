@@ -26,6 +26,7 @@
 
 goog.provide('Blockly.FlyoutButton');
 
+goog.require('Blockly.FlyoutLabel');
 goog.require('goog.dom');
 goog.require('goog.math.Coordinate');
 
@@ -36,33 +37,14 @@ goog.require('goog.math.Coordinate');
  *     button.
  * @param {!Blockly.Workspace} targetWorkspace The flyout's target workspace.
  * @param {string} text The text to display on the button.
+ * @extends {Blockly.FlyoutLabel}
  * @constructor
  */
 Blockly.FlyoutButton = function(workspace, targetWorkspace, text) {
-  /**
-   * @type {!Blockly.Workspace}
-   * @private
-   */
-  this.workspace_ = workspace;
-
-  /**
-   * @type {!Blockly.Workspace}
-   * @private
-   */
-  this.targetWorkspace_ = targetWorkspace;
-
-  /**
-   * @type {string}
-   * @private
-   */
-  this.text_ = text;
-
-  /**
-   * @type {goog.math.Coordinate}
-   * @private
-   */
-  this.position_ = new goog.math.Coordinate(0, 0);
+  Blockly.FlyoutButton.superClass_.constructor.call(this,
+      workspace, targetWorkspace, text);
 };
+goog.inherits(Blockly.FlyoutButton, Blockly.FlyoutLabel);
 
 /**
  * The margin around the text in the button.
@@ -118,16 +100,14 @@ Blockly.FlyoutButton.prototype.createDom = function() {
  * Correctly position the flyout button and make it visible.
  */
 Blockly.FlyoutButton.prototype.show = function() {
-  this.updateTransform_();
-  this.svgGroup_.setAttribute('display', 'block');
+  Blockly.FlyoutButton.superClass_.show.call(this);
 };
 
 /**
  * Update svg attributes to match internal state.
  */
 Blockly.FlyoutButton.prototype.updateTransform_ = function() {
-  this.svgGroup_.setAttribute('transform', 'translate(' + this.position_.x +
-      ',' + this.position_.y + ')');
+  Blockly.FlyoutButton.superClass_.updateTransform_.call(this);
 };
 
 /**
@@ -136,21 +116,14 @@ Blockly.FlyoutButton.prototype.updateTransform_ = function() {
  * @param {number} y The new y coordinate.
  */
 Blockly.FlyoutButton.prototype.moveTo = function(x, y) {
-  this.position_.x = x;
-  this.position_.y = y;
-  this.updateTransform_();
+  Blockly.FlyoutButton.superClass_.moveTo.call(this, x, y);
 };
 
 /**
  * Dispose of this button.
  */
 Blockly.FlyoutButton.prototype.dispose = function() {
-  if (this.svgGroup_) {
-    goog.dom.removeNode(this.svgGroup_);
-    this.svgGroup_ = null;
-  }
-  this.workspace_ = null;
-  this.targetWorkspace_ = null;
+  Blockly.FlyoutButton.superClass_.dispose.call(this);
 };
 
 /**
