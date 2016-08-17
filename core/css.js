@@ -135,7 +135,7 @@ Blockly.Css.CONTENT = [
     'background-color: #fff;',
     'outline: none;',
     'overflow: hidden;',  /* IE overflows by default. */
-    'display: block;', 
+    'display: block;',
   '}',
 
   '.blocklyWidgetDiv {',
@@ -264,6 +264,10 @@ Blockly.Css.CONTENT = [
 
   '.blocklyFlyoutButton:hover {',
     'fill: #ccc;',
+  '}',
+
+  '.blocklyFlyoutLabelText {',
+    'fill: #000;',
   '}',
 
   /*
